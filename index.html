@@ -5,6 +5,7 @@
 <link rel="manifest" href="manifest.webmanifest"/>
 <link rel="icon" href="icon.svg"/>
 <title>Carnes & Sons — Claude</title>
+<script src="https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.18.3/dist/twilio.min.js"></script>
 <style>
 :root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:max(env(safe-area-inset-bottom),56px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -50,6 +51,8 @@ svg{display:block}.icn{width:22px;height:22px}
 .smshead{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
 .smshead .bk{background:none;border:none;color:var(--accent);padding:4px;flex:none;display:flex}
 .smshead .av{width:34px;height:34px;font-size:13px}.smshead .nm{font-size:15px;font-weight:700;line-height:1.15}.smshead .ph{font-size:12px;color:var(--muted)}
+.smshead .callbtn{margin-left:auto;background:var(--surface2);border:1px solid var(--line);color:var(--accent);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.smshead .callbtn:active{background:var(--accent);color:#08101f}
 .scroll{flex:1 1 auto;overflow-y:auto;padding:14px;min-height:0}
 .row{display:flex;margin:8px 0 0}.row.me{justify-content:flex-end}
 .bubble{max-width:84%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
@@ -86,8 +89,20 @@ svg{display:block}.icn{width:22px;height:22px}
 .login button.cta{width:100%;max-width:300px;padding:14px;border-radius:13px;border:none;background:var(--grad);color:#06121f;font-size:16px;font-weight:800;box-shadow:0 6px 20px rgba(34,211,238,.3)}
 .login .link{background:none;border:none;color:var(--accent);font-size:13px}.login .err{color:#fca5a5;font-size:13px;min-height:16px}
 .login .ver{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:0;right:0;color:var(--faint);font-size:11px}
+.callscreen{position:fixed;inset:0;z-index:80;background:radial-gradient(120% 90% at 50% 0%,rgba(34,211,238,.16),transparent 55%),var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:34px;text-align:center}
+.callscreen.on{display:flex}
+.callscreen .cav{width:104px;height:104px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:800;color:#08101f;box-shadow:0 10px 40px rgba(34,211,238,.25)}
+.callscreen .cname{font-size:25px;font-weight:800;letter-spacing:-.01em}
+.callscreen .cstat{color:var(--accent);font-size:14px;font-weight:600}
+.callscreen .ctimer{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.callscreen .cbtns{display:flex;gap:32px;margin-top:30px}
+.callscreen .cbtn{width:66px;height:66px;border-radius:50%;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:600;color:#fff}
+.callscreen .cbtn .icn{width:24px;height:24px}
+.callscreen .cbtn.mute{background:var(--surface2);border:1px solid var(--line);color:var(--text)}
+.callscreen .cbtn.mute.on{background:var(--accent);color:#08101f;border-color:var(--accent)}
+.callscreen .cbtn.end{background:#f43f5e}
 .hide{display:none!important}
-.toast{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--line);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none}
+.toast{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--line);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:90;pointer-events:none}
 .toast.on{opacity:1}
 </style></head><body><div id="shell">
 <header class="appbar" id="appbar"><div class="brand"><div class="logo">C&amp;S</div><div class="t"><b>Carnes &amp; Sons</b><span id="who">AI Assistant</span></div></div><button class="out" id="refreshBtn" title="Check for update">↻</button><button class="out" id="logoutBtn">Log out</button></header>
@@ -95,7 +110,7 @@ svg{display:block}.icn{width:22px;height:22px}
 <div class="content" id="content">
   <section class="view" id="view-today"><div class="hero"><svg class="deco" viewBox="0 0 100 100" fill="none" stroke="#34d3ee" stroke-width="3" stroke-linecap="round"><circle cx="50" cy="50" r="14"/><path d="M50 6v18M50 76v18M6 50h18M76 50h18M19 19l13 13M68 68l13 13M81 19L68 32M32 68L19 81"/></svg><h1 class="hi" id="hello">Welcome</h1><p class="dt" id="subhello"></p></div><div class="sect">Quick questions</div><div class="chips" id="chips"></div></section>
   <section class="view" id="view-sms"><div id="sms-list"><div class="loading">Loading conversations…</div></div></section>
-  <section class="view" id="view-smsthread"><div class="smshead"><button class="bk" id="smsBack"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="av" id="smsAv">#</div><div><div class="nm" id="smsName"></div><div class="ph" id="smsPhone"></div></div></div><div class="scroll" id="sms-scroll"></div></section>
+  <section class="view" id="view-smsthread"><div class="smshead"><button class="bk" id="smsBack"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="av" id="smsAv">#</div><div><div class="nm" id="smsName"></div><div class="ph" id="smsPhone"></div></div><button class="callbtn" id="smsCall" title="Call"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l1.5 5-2 1a11 11 0 005 5l1-2 5 1.5V21a1 1 0 01-1 1A17 17 0 014 6a1 1 0 011-2z"/></svg></button></div><div class="scroll" id="sms-scroll"></div></section>
   <section class="view" id="view-chat"><div class="scroll" id="scroll"></div><div class="typing hide" id="typing">Claude is thinking…</div></section>
   <section class="view" id="view-alerts">
     <div class="sect">Notifications</div>
@@ -103,7 +118,7 @@ svg{display:block}.icn{width:22px;height:22px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.2.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.3.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
   </section>
 </div>
 <div class="composer" id="composer"><button class="iconbtn mic" id="micBtn" title="Speak"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg></button><textarea id="msg" rows="1" placeholder="Ask Claude…"></textarea><button class="iconbtn snd" id="send"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
@@ -114,21 +129,23 @@ svg{display:block}.icn{width:22px;height:22px}
   <button data-v="alerts"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10a5 5 0 0110 0c0 5 2 6 2 6H5s2-1 2-6z"/><path d="M10 19a2 2 0 004 0"/></svg>Alerts</button>
 </nav>
 </div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.2.0</div></div>
+<div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.3.0</div></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.2.0';
+  var VERSION='2.3.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
   var phoneVal='';var history=[];var greeted=false;var view='today';var smsOpenPhone=null,smsOpenName='',smsLoaded=false;
   var $=function(id){return document.getElementById(id);};
   function api(path,body){return fetch(BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});});}
-  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1600);}
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1900);}
   function showErr(t){$('loginErr').textContent=t||'';}
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
   function fmtPhone(p){var d=String(p||'').replace(/[^0-9]/g,'');if(d.length===11&&d[0]==='1')d=d.slice(1);if(d.length===10)return '('+d.slice(0,3)+') '+d.slice(3,6)+'-'+d.slice(6);return p||'';}
+  function e164(p){var d=String(p||'').replace(/[^0-9]/g,'');if(d.length===10)return '+1'+d;if(d.length===11&&d[0]==='1')return '+'+d;if(String(p||'').indexOf('+')===0)return p;return d?('+'+d):'';}
   function initials(n){if(!n)return '#';var p=n.trim().split(/\s+/);return ((p[0]?p[0][0]:'')+(p[1]?p[1][0]:'')).toUpperCase()||'#';}
   var AVG=['linear-gradient(135deg,#22d3ee,#3b82f6)','linear-gradient(135deg,#34d399,#06b6d4)','linear-gradient(135deg,#a78bfa,#6366f1)','linear-gradient(135deg,#fbbf24,#f97316)','linear-gradient(135deg,#f472b6,#db2777)','linear-gradient(135deg,#38bdf8,#818cf8)'];
   function avColor(s){var h=0;s=String(s||'?');for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return AVG[h%AVG.length];}
@@ -136,6 +153,19 @@ svg{display:block}.icn{width:22px;height:22px}
   function timeShort(iso){if(!iso)return '';var d=new Date(iso);var now=new Date();if(d.toDateString()===now.toDateString())return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'});}
   function urlB64(s){var pad='='.repeat((4-s.length%4)%4);var b=(s+pad).replace(/-/g,'+').replace(/_/g,'/');var raw=atob(b);var arr=new Uint8Array(raw.length);for(var i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);return arr;}
   function subscribePush(){try{if(!('serviceWorker' in navigator)||!('PushManager' in window))return;navigator.serviceWorker.ready.then(function(reg){return reg.pushManager.getSubscription().then(function(sub){return sub||reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64(VAPID)});});}).then(function(sub){if(sub)api('push-subscribe',{token:token,subscription:sub.toJSON(),ua:navigator.userAgent});}).catch(function(){});}catch(_e){}}
+
+  // ===== Softphone (Twilio Voice SDK, outbound only) =====
+  var device=null,activeCall=null,callMuted=false,callTick=null,callStart=0;
+  function callStat(t){$('callStat').textContent=t;}
+  function openCallUI(name,number){callMuted=false;$('muteBtn').classList.remove('on');var dn=name||fmtPhone(number);$('callName').textContent=dn;$('callAv').textContent=initials(name||'');$('callAv').style.background=avColor(dn);$('callTimer').textContent='';callStat('Calling…');$('callscreen').classList.add('on');}
+  function endCallUI(){$('callscreen').classList.remove('on');if(callTick){clearInterval(callTick);callTick=null;}activeCall=null;}
+  function startTimer(){callStart=Date.now();if(callTick)clearInterval(callTick);callTick=setInterval(function(){var s=Math.floor((Date.now()-callStart)/1000);var m=Math.floor(s/60);$('callTimer').textContent=(m<10?'0':'')+m+':'+((s%60)<10?'0':'')+(s%60);},1000);}
+  function getVoiceToken(){return api('twilio-token',{token:token,identity:'pwa-owner'}).then(function(res){if(res.j&&res.j.token)return res.j.token;throw new Error((res.j&&res.j.error)||'token');});}
+  function ensureDevice(){if(device)return Promise.resolve(device);if(!window.Twilio||!window.Twilio.Device)return Promise.reject(new Error('Dialer still loading — try again'));return getVoiceToken().then(function(vt){device=new window.Twilio.Device(vt,{codecPreferences:['opus','pcmu'],logLevel:'error'});device.on('tokenWillExpire',function(){getVoiceToken().then(function(t2){try{device.updateToken(t2);}catch(_e){}}).catch(function(){});});device.on('error',function(e){toast((e&&e.message)?('Call error: '+e.message):'Call error');endCallUI();});return device;});}
+  function placeCall(number,name){var to=e164(number);if(!to){toast('No number to call');return;}openCallUI(name,to);ensureDevice().then(function(dev){var p=dev.connect({params:{To:to}});var bind=function(call){activeCall=call;call.on('accept',function(){callStat('In call');startTimer();});call.on('disconnect',endCallUI);call.on('cancel',endCallUI);call.on('reject',function(){callStat('Call rejected');setTimeout(endCallUI,1200);});};if(p&&p.then){p.then(bind).catch(function(){toast('Could not start call');endCallUI();});}else{bind(p);}}).catch(function(e){toast((e&&e.message)||'Call failed');endCallUI();});}
+  $('muteBtn').onclick=function(){if(!activeCall)return;callMuted=!callMuted;try{activeCall.mute(callMuted);}catch(_e){}$('muteBtn').classList.toggle('on',callMuted);};
+  $('hangBtn').onclick=function(){try{if(activeCall)activeCall.disconnect();}catch(_e){}endCallUI();};
+  $('smsCall').onclick=function(){if(smsOpenPhone)placeCall(smsOpenPhone,smsOpenName);};
 
   $('sendBtn').onclick=function(){var p=$('phone').value.trim();if(!p){showErr('Enter your phone number.');return;}if(p.indexOf('+')!==0){var d=p.replace(/[^0-9]/g,'');p=(d.length===10?'+1'+d:'+'+d);}phoneVal=p;showErr('');$('sendBtn').textContent='Sending…';$('sendBtn').disabled=true;api('staff-auth-request',{phone:p}).then(function(res){$('sendBtn').textContent='Text me a code';$('sendBtn').disabled=false;if(res.ok){$('step1').classList.add('hide');$('step2').classList.remove('hide');$('loginMsg').textContent='Enter the code we texted to '+p;$('code').focus();}else showErr((res.j&&res.j.error)||'Could not send a code.');}).catch(function(){$('sendBtn').textContent='Text me a code';$('sendBtn').disabled=false;showErr('Network error.');});};
   $('backBtn').onclick=function(){$('step2').classList.add('hide');$('step1').classList.remove('hide');$('loginMsg').textContent='Sign in with your staff phone number.';showErr('');};
