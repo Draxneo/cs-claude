@@ -26,6 +26,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helveti
 .login input{width:100%;max-width:300px;padding:13px 15px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:17px;text-align:center}
 .login button{width:100%;max-width:300px;padding:13px;border-radius:12px;border:none;background:#2563eb;color:#fff;font-size:16px;font-weight:600}
 .login .err{color:#fca5a5;font-size:13px;min-height:16px}
+.ver{position:fixed;bottom:10px;left:0;right:0;text-align:center;color:#475569;font-size:11px}
 .hide{display:none!important}
 .typing{color:#64748b;font-size:13px;padding:4px 14px}
 </style></head><body><div id="app">
@@ -44,6 +45,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helveti
     <button class="lk" id="backBtn" style="background:none">Use a different number</button>
   </div>
   <div class="err" id="loginErr"></div>
+  <div class="ver">Carnes & Sons • v1.0.0</div>
 </div>
 
 <div id="chatView" class="hide" style="display:flex;flex-direction:column;height:100%">
@@ -55,6 +57,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helveti
 
 </div><script>
 (function(){
+  var VERSION = '1.0.0';
   var BASE = 'https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var token = localStorage.getItem('cs_token');
   var who = localStorage.getItem('cs_name') || '';
@@ -94,7 +97,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helveti
   }
   function enterChat(){
     $('loginView').classList.add('hide'); $('chatView').classList.remove('hide');
-    $('who').textContent = who ? ('Signed in as '+who) : '';
+    $('who').textContent = (who ? ('Signed in as '+who+' • ') : '') + 'v'+VERSION;
     if (!history.length){ bubble('sys', 'Hi'+(who?(' '+who.split(' ')[0]):'')+". Ask me about today's schedule, jobs, customers, or voicemails."); }
     $('msg').focus();
   }
