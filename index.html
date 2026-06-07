@@ -6,7 +6,7 @@
 <link rel="icon" href="icon.svg"/>
 <title>Carnes & Sons — Claude</title>
 <style>
-:root{--navy:#0f172a;--navy2:#1e293b;--accent:#2563eb;--accent-d:#1d4ed8;--bg:#f6f7f9;--surface:#fff;--line:#e6e8ec;--text:#0f172a;--muted:#64748b;--faint:#94a3b8}
+:root{--navy:#0f172a;--navy2:#1e293b;--accent:#2563eb;--accent-d:#1d4ed8;--bg:#f6f7f9;--surface:#fff;--line:#e6e8ec;--text:#0f172a;--muted:#64748b;--faint:#94a3b8;--safe-b:max(env(safe-area-inset-bottom),18px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
 #shell{display:flex;flex-direction:column;height:100dvh}
@@ -18,9 +18,10 @@ html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Seg
 .brand .t b{font-size:15px;font-weight:700}
 .brand .t span{display:block;font-size:11px;color:#93c5fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .appbar .out{background:rgba(255,255,255,.12);border:none;color:#cbd5e1;font-size:12px;padding:7px 11px;border-radius:8px}
-.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
 .view{display:none;padding:16px}
 .view.on{display:block}
+#view-today.on{padding-bottom:24px}
 #view-chat.on{display:flex;flex-direction:column;padding:0;height:100%}
 .hello{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 2px}
 .subhello{color:var(--muted);font-size:13px;margin:0 2px 18px}
@@ -32,7 +33,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Seg
 .chip .cx{min-width:0}
 .chip .cx small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:1px}
 .chip .go{margin-left:auto;color:var(--faint);font-size:18px}
-.scroll{flex:1;overflow-y:auto;padding:14px;background:var(--bg)}
+.scroll{flex:1;overflow-y:auto;padding:14px;background:var(--bg);min-height:0}
 .row{display:flex;margin:8px 0 0}
 .row.me{justify-content:flex-end}
 .bubble{max-width:84%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
@@ -57,7 +58,7 @@ html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Seg
 .mic.rec{background:#fee2e2;color:#dc2626;animation:pulse 1.1s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .snd{background:var(--accent);color:#fff}
-.bnav{display:none;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.bnav{display:none;background:var(--surface);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
 .bnav.on{display:flex}
 .bnav button{flex:1;background:none;border:none;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--faint);font-size:11px;font-weight:600;cursor:pointer}
 .bnav button .bi{font-size:20px;line-height:1}
@@ -74,9 +75,9 @@ html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Seg
 .login button.cta{width:100%;max-width:300px;padding:14px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:700}
 .login .link{background:none;border:none;color:#93c5fd;font-size:13px}
 .login .err{color:#fca5a5;font-size:13px;min-height:16px}
-.login .ver{position:fixed;bottom:12px;left:0;right:0;color:#475569;font-size:11px}
+.login .ver{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:0;right:0;color:#475569;font-size:11px}
 .hide{display:none!important}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none}
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none}
 .toast.on{opacity:.95}
 </style></head><body><div id="shell">
 
@@ -128,14 +129,14 @@ html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Seg
     <button class="link" id="backBtn">Use a different number</button>
   </div>
   <div class="err" id="loginErr"></div>
-  <div class="ver">Carnes &amp; Sons • v1.1.1</div>
+  <div class="ver">Carnes &amp; Sons • v1.1.2</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
-  var VERSION='1.1.1';
+  var VERSION='1.1.2';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var token=localStorage.getItem('cs_token');
   var who=localStorage.getItem('cs_name')||'';
