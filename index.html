@@ -6,7 +6,7 @@
 <link rel="icon" href="icon.svg"/>
 <title>Carnes & Sons — Claude</title>
 <style>
-:root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:max(env(safe-area-inset-bottom),24px)}
+:root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:max(env(safe-area-inset-bottom),56px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);position:fixed;width:100%}
 #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
@@ -130,7 +130,7 @@ svg{display:block}.icn{width:22px;height:22px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed, set this app's battery usage to Unrestricted:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.1.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.1.1</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
   </section>
 </div>
 
@@ -162,14 +162,14 @@ svg{display:block}.icn{width:22px;height:22px}
     <button class="link" id="backBtn">Use a different number</button>
   </div>
   <div class="err" id="loginErr"></div>
-  <div class="ver">Carnes &amp; Sons • v2.1.0</div>
+  <div class="ver">Carnes &amp; Sons • v2.1.1</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
-  var VERSION='2.1.0';
+  var VERSION='2.1.1';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
   var phoneVal='';var history=[];var greeted=false;var view='today';
@@ -191,19 +191,11 @@ svg{display:block}.icn{width:22px;height:22px}
   $('verifyBtn').onclick=function(){var c=$('code').value.trim();if(!c){showErr('Enter the code.');return;}showErr('');$('verifyBtn').textContent='Signing in…';$('verifyBtn').disabled=true;api('extension-otp-verify',{phone:phoneVal,code:c}).then(function(res){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;if(res.ok&&res.j&&res.j.token){token=res.j.token;who=res.j.employee_name||'';localStorage.setItem('cs_token',token);localStorage.setItem('cs_name',who);enterApp();}else showErr((res.j&&res.j.error)||'Invalid code.');}).catch(function(){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;showErr('Network error.');});};
   $('logoutBtn').onclick=function(){localStorage.removeItem('cs_token');localStorage.removeItem('cs_name');location.reload();};
 
-  function enterApp(){
-    $('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');
-    $('who').textContent=(who?who:'Owner')+' · v'+VERSION;
-    var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';
-    $('hello').textContent=part+(first?(', '+first):'');
-    $('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
-    buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}setView('today');
-  }
+  function enterApp(){$('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');$('who').textContent=(who?who:'Owner')+' · v'+VERSION;var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';$('hello').textContent=part+(first?(', '+first):'');$('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}setView('today');}
   function setView(v){view=v;['today','sms','smsthread','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});document.querySelectorAll('.bnav button').forEach(function(b){var bv=b.getAttribute('data-v');b.classList.toggle('on',bv===v||(v==='smsthread'&&bv==='sms'));});$('composer').classList.toggle('on',v==='chat'||v==='smsthread');if(v==='chat'){$('msg').placeholder='Ask Claude…';if(!greeted){greeted=true;bubble('sys','Ask me anything about today — the schedule, a customer, voicemails, or whether we can fit a job in.',$('scroll'));}setTimeout(function(){$('msg').focus();},50);}if(v==='sms'){loadSmsList();}if(v==='smsthread'){$('msg').placeholder='Text '+(smsOpenName||fmtPhone(smsOpenPhone))+'…';setTimeout(function(){$('msg').focus();},50);}if(v==='alerts'){refreshNotifPill();}}
   document.querySelectorAll('.bnav button').forEach(function(b){b.onclick=function(){setView(b.getAttribute('data-v'));};});
   $('smsBack').onclick=function(){setView('sms');};
 
-  /* notifications + update */
   function refreshNotifPill(){var p=$('notifPill');if(!('Notification' in window)){p.textContent='N/A';return;}var g=Notification.permission==='granted';p.textContent=g?'On':'Off';p.className='pill '+(g?'on':'off');}
   $('enableNotifs').onclick=function(){if(!('Notification' in window)){toast('Notifications not supported on this device');return;}Notification.requestPermission().then(function(perm){refreshNotifPill();if(perm==='granted'){toast('Notifications enabled');try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}}else{toast('Permission was not granted');}});};
   function hardRefresh(){toast('Updating…');var done=function(){location.reload(true);};try{if(window.caches){caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}).then(function(){if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister();});}).finally(done);}else done();}).catch(done);}else done();}catch(_e){done();}}
@@ -235,12 +227,7 @@ svg{display:block}.icn{width:22px;height:22px}
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var rec=null,recOn=false;
   if(!SR){$('micBtn').style.display='none';}else{rec=new SR();rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=1;rec.onresult=function(e){var tx=e.results[0][0].transcript;$('msg').value=($('msg').value?($('msg').value+' '):'')+tx;auto();};rec.onend=function(){recOn=false;$('micBtn').classList.remove('rec');};rec.onerror=function(){recOn=false;$('micBtn').classList.remove('rec');};$('micBtn').onclick=function(){if(recOn){rec.stop();return;}try{rec.start();recOn=true;$('micBtn').classList.add('rec');$('msg').focus();}catch(_e){}};}
 
-  /* service worker + auto-update */
-  if('serviceWorker' in navigator){
-    var reloaded=false;
-    navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloaded)return;reloaded=true;location.reload();});
-    navigator.serviceWorker.register('sw.js').then(function(reg){reg.update();setInterval(function(){reg.update();},60*60*1000);}).catch(function(){});
-  }
+  if('serviceWorker' in navigator){var reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloaded)return;reloaded=true;location.reload();});navigator.serviceWorker.register('sw.js').then(function(reg){reg.update();setInterval(function(){reg.update();},60*60*1000);}).catch(function(){});}
   if(token)enterApp();
 })();
 </script></body></html>
