@@ -6,7 +6,7 @@
 <link rel="icon" href="icon.svg"/>
 <title>Carnes & Sons — Claude</title>
 <style>
-:root{--navy:#0f172a;--navy2:#1e293b;--accent:#2563eb;--bg:#f6f7f9;--surface:#fff;--line:#e6e8ec;--text:#0f172a;--muted:#64748b;--faint:#94a3b8;--safe-b:max(env(safe-area-inset-bottom),56px)}
+:root{--navy:#0f172a;--navy2:#1e293b;--accent:#2563eb;--bg:#f6f7f9;--surface:#fff;--line:#e6e8ec;--text:#0f172a;--muted:#64748b;--faint:#94a3b8;--safe-b:max(env(safe-area-inset-bottom),24px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);position:fixed;width:100%}
 #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
@@ -18,6 +18,8 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
 .brand .t b{font-size:15px;font-weight:700}
 .brand .t span{display:block;font-size:11px;color:#93c5fd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .appbar .out{background:rgba(255,255,255,.12);border:none;color:#cbd5e1;font-size:12px;padding:7px 11px;border-radius:8px}
+#ptr{display:flex;align-items:center;justify-content:center;height:0;overflow:hidden;color:var(--muted);font-size:12px;background:var(--bg);transition:height .15s;flex:none}
+#ptr.show{height:34px}
 .content{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
 .view{display:none;padding:16px}
 .view.on{display:block}
@@ -97,6 +99,7 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   <div class="brand"><div class="logo">C&amp;S</div><div class="t"><b>Carnes &amp; Sons</b><span id="who">AI Assistant</span></div></div>
   <button class="out" id="logoutBtn">Log out</button>
 </header>
+<div id="ptr">↓ Pull to refresh</div>
 
 <div class="content" id="content">
   <section class="view" id="view-today">
@@ -149,14 +152,14 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
     <button class="link" id="backBtn">Use a different number</button>
   </div>
   <div class="err" id="loginErr"></div>
-  <div class="ver">Carnes &amp; Sons • v1.2.0</div>
+  <div class="ver">Carnes &amp; Sons • v1.3.0</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
-  var VERSION='1.2.0';
+  var VERSION='1.3.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var token=localStorage.getItem('cs_token');
   var who=localStorage.getItem('cs_name')||'';
@@ -172,7 +175,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   function nowTime(){return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
   function timeShort(iso){if(!iso)return '';var d=new Date(iso);var now=new Date();if(d.toDateString()===now.toDateString())return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});return d.toLocaleDateString('en-US',{month:'numeric',day:'numeric'});}
 
-  /* ---- login ---- */
   $('sendBtn').onclick=function(){
     var p=$('phone').value.trim();if(!p){showErr('Enter your phone number.');return;}
     if(p.indexOf('+')!==0){var d=p.replace(/[^0-9]/g,'');p=(d.length===10?'+1'+d:'+'+d);}
@@ -195,7 +197,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   };
   $('logoutBtn').onclick=function(){localStorage.removeItem('cs_token');localStorage.removeItem('cs_name');location.reload();};
 
-  /* ---- shell ---- */
   function enterApp(){
     $('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');
     $('who').textContent=(who?who:'Owner')+' · v'+VERSION;
@@ -217,7 +218,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   document.querySelectorAll('.bnav button').forEach(function(b){b.onclick=function(){setView(b.getAttribute('data-v'));};});
   $('smsBack').onclick=function(){setView('sms');};
 
-  /* ---- Today chips ---- */
   var CHIPS=[
     {ic:'🗓️',t:"Today's schedule",q:'How does today’s schedule look? Who is going where?'},
     {ic:'📞',t:'Voicemails',s:'Anything I haven’t seen',q:'Are there any new voicemails or missed calls I should know about?'},
@@ -227,7 +227,6 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   ];
   function buildChips(){var w=$('chips');w.innerHTML='';CHIPS.forEach(function(c){var b=document.createElement('button');b.className='chip';b.innerHTML='<span class="ic">'+c.ic+'</span><span class="cx">'+c.t+(c.s?('<small>'+c.s+'</small>'):'')+'</span><span class="go">›</span>';b.onclick=function(){setView('chat');if(c.q.slice(-1)===' '){$('msg').value=c.q;$('msg').focus();auto();}else{sendChat(c.q);}};w.appendChild(b);});}
 
-  /* ---- SMS list ---- */
   function loadSmsList(force){
     if(smsLoaded&&!force)return;
     $('sms-list').innerHTML='<div class="loading">Loading conversations…</div>';
@@ -239,9 +238,7 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
         var name=(t.customer&&t.customer.name)||fmtPhone(t.customer_phone);
         var pre=(t.last_message&&((t.last_message.direction==='outbound'?'You: ':'')+(t.last_message.body||'')))||'';
         var row=document.createElement('div');row.className='thread';
-        row.innerHTML='<div class="av">'+esc(initials((t.customer&&t.customer.name)||''))+'</div>'+
-          '<div class="tx"><div class="nm">'+esc(name)+'</div><div class="pre">'+esc(pre)+'</div></div>'+
-          '<div class="tm">'+timeShort(t.last_message_at)+'</div>';
+        row.innerHTML='<div class="av">'+esc(initials((t.customer&&t.customer.name)||''))+'</div><div class="tx"><div class="nm">'+esc(name)+'</div><div class="pre">'+esc(pre)+'</div></div><div class="tm">'+timeShort(t.last_message_at)+'</div>';
         row.onclick=function(){openThread(t.customer_phone,(t.customer&&t.customer.name)||'');};
         w.appendChild(row);
       });
@@ -268,13 +265,12 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
     var mr=document.createElement('div');mr.className='row metarow'+(mine?' me':'');mr.innerHTML='<div class="meta"><span>'+timeShort(m.created_at)+'</span></div>';$('sms-scroll').appendChild(mr);
   }
   function sendSms(text){
-    if(!smsOpenPhone)return;
+    if(!smsOpenPhone||!text)return;
     $('msg').value='';auto();
-    var m={direction:'outbound',body:text,created_at:new Date().toISOString()};smsBubble(m);$('sms-scroll').scrollTop=$('sms-scroll').scrollHeight;
+    smsBubble({direction:'outbound',body:text,created_at:new Date().toISOString()});$('sms-scroll').scrollTop=$('sms-scroll').scrollHeight;
     api('hcp-extension-sms',{to:smsOpenPhone,body:text,token:token}).then(function(res){if(!(res.j&&res.j.ok)){toast((res.j&&res.j.error)||'Send failed');}}).catch(function(){toast('Network error');});
   }
 
-  /* ---- Claude chat ---- */
   function inline(s){return s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
   function mdToHtml(t){var lines=esc(t).split('\n');var out='';var inUl=false,inOl=false;function close(){if(inUl){out+='</ul>';inUl=false;}if(inOl){out+='</ol>';inOl=false;}}for(var i=0;i<lines.length;i++){var ln=lines[i];var mUl=ln.match(/^\s*[-•]\s+(.*)/);var mOl=ln.match(/^\s*\d+[.)]\s+(.*)/);if(mUl){if(!inUl){close();out+='<ul>';inUl=true;}out+='<li>'+inline(mUl[1])+'</li>';}else if(mOl){if(!inOl){close();out+='<ol>';inOl=true;}out+='<li>'+inline(mOl[1])+'</li>';}else{close();if(ln.trim()==='')out+='<br/>';else out+=inline(ln)+'<br/>';}}close();return out;}
   function bubble(role,text,cont){cont=cont||$('scroll');
@@ -296,6 +292,13 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
   $('send').onclick=doSend;
   $('msg').addEventListener('input',auto);
   $('msg').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
+
+  /* pull-to-refresh on the content scroller (Texts list / open thread) */
+  var pSy=0,pulling=false,ready=false;var content=$('content');
+  content.addEventListener('touchstart',function(e){if(content.scrollTop<=0&&(view==='sms'||view==='smsthread')){pSy=e.touches[0].clientY;pulling=true;ready=false;}},{passive:true});
+  content.addEventListener('touchmove',function(e){if(!pulling)return;var dy=e.touches[0].clientY-pSy;if(dy>8&&content.scrollTop<=0){ready=dy>64;$('ptr').classList.add('show');$('ptr').textContent=ready?'↑ Release to refresh':'↓ Pull to refresh';}},{passive:true});
+  content.addEventListener('touchend',function(){if(pulling&&ready){$('ptr').textContent='Refreshing…';refreshCurrent();setTimeout(function(){$('ptr').classList.remove('show');},800);}else{$('ptr').classList.remove('show');}pulling=false;});
+  function refreshCurrent(){if(view==='sms')loadSmsList(true);else if(view==='smsthread'&&smsOpenPhone)openThread(smsOpenPhone,smsOpenName);}
 
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var rec=null,recOn=false;
   if(!SR){$('micBtn').style.display='none';}
