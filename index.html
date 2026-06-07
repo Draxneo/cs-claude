@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#0f172a"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" href="icon.svg"/>
+<title>Carnes & Sons — Claude</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0f172a;color:#0f172a}
+#app{display:flex;flex-direction:column;height:100dvh}
+.hdr{background:#0f172a;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;padding-top:calc(14px + env(safe-area-inset-top))}
+.hdr b{font-size:16px} .hdr .sub{font-size:12px;color:#93c5fd}
+.lk{color:#93c5fd;background:none;border:none;font-size:13px}
+.scroll{flex:1;overflow-y:auto;background:#f1f5f9;padding:14px}
+.row{display:flex;margin:8px 0} .row.me{justify-content:flex-end}
+.b{max-width:82%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
+.b.them{background:#fff;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
+.b.me{background:#2563eb;color:#fff;border-bottom-right-radius:4px}
+.b.sys{background:#fef3c7;border:1px solid #fde68a;font-size:13px;margin:0 auto}
+.composer{display:flex;gap:8px;padding:10px;background:#fff;border-top:1px solid #e2e8f0;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+.composer textarea{flex:1;resize:none;border:1px solid #cbd5e1;border-radius:20px;padding:10px 14px;font-size:15px;max-height:120px;font-family:inherit}
+.composer button{border:none;background:#2563eb;color:#fff;border-radius:50%;width:44px;height:44px;font-size:18px;flex:none}
+.login{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#0f172a;color:#fff;padding:24px;gap:14px;text-align:center}
+.login h1{font-size:22px;margin:0} .login p{color:#94a3b8;margin:0;font-size:14px}
+.login input{width:100%;max-width:300px;padding:13px 15px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:17px;text-align:center}
+.login button{width:100%;max-width:300px;padding:13px;border-radius:12px;border:none;background:#2563eb;color:#fff;font-size:16px;font-weight:600}
+.login .err{color:#fca5a5;font-size:13px;min-height:16px}
+.hide{display:none!important}
+.typing{color:#64748b;font-size:13px;padding:4px 14px}
+</style></head><body><div id="app">
+
+<div id="loginView" class="login">
+  <div style="font-size:40px">🏠</div>
+  <h1>Carnes & Sons</h1>
+  <p id="loginMsg">Sign in with your staff phone number.</p>
+  <div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%">
+    <input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/>
+    <button id="sendBtn">Text me a code</button>
+  </div>
+  <div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%">
+    <input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/>
+    <button id="verifyBtn">Sign in</button>
+    <button class="lk" id="backBtn" style="background:none">Use a different number</button>
+  </div>
+  <div class="err" id="loginErr"></div>
+</div>
+
+<div id="chatView" class="hide" style="display:flex;flex-direction:column;height:100%">
+  <div class="hdr"><div><b>Claude</b><div class="sub" id="who"></div></div><button class="lk" id="logoutBtn">Log out</button></div>
+  <div class="scroll" id="scroll"></div>
+  <div class="typing hide" id="typing">Claude is thinking…</div>
+  <div class="composer"><textarea id="msg" rows="1" placeholder="Ask about today’s schedule, voicemails…"></textarea><button id="send">↑</button></div>
+</div>
+
+</div><script>
+(function(){
+  var BASE = 'https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
+  var token = localStorage.getItem('cs_token');
+  var who = localStorage.getItem('cs_name') || '';
+  var phoneVal = '';
+  var history = [];
+  var $ = function(id){ return document.getElementById(id); };
+  function showErr(t){ $('loginErr').textContent = t || ''; }
+  function api(path, body){
+    return fetch(BASE + path, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, j:j }; }); });
+  }
+  $('sendBtn').onclick = function(){
+    var p = $('phone').value.trim(); if(!p){ showErr('Enter your phone number.'); return; }
+    if (p.indexOf('+') !== 0) { var dd = p.replace(/[^0-9]/g,''); p = (dd.length===10? '+1'+dd : '+'+dd); }
+    phoneVal = p; showErr(''); $('sendBtn').textContent='Sending…'; $('sendBtn').disabled=true;
+    api('staff-auth-request', { phone:p }).then(function(res){
+      $('sendBtn').textContent='Text me a code'; $('sendBtn').disabled=false;
+      if(res.ok){ $('step1').classList.add('hide'); $('step2').classList.remove('hide'); $('loginMsg').textContent='Enter the code we texted to '+p; $('code').focus(); }
+      else showErr((res.j&&res.j.error)||'Could not send a code.');
+    }).catch(function(){ $('sendBtn').textContent='Text me a code'; $('sendBtn').disabled=false; showErr('Network error.'); });
+  };
+  $('backBtn').onclick = function(){ $('step2').classList.add('hide'); $('step1').classList.remove('hide'); $('loginMsg').textContent='Sign in with your staff phone number.'; showErr(''); };
+  $('verifyBtn').onclick = function(){
+    var c = $('code').value.trim(); if(!c){ showErr('Enter the code.'); return; }
+    showErr(''); $('verifyBtn').textContent='Signing in…'; $('verifyBtn').disabled=true;
+    api('extension-otp-verify', { phone:phoneVal, code:c }).then(function(res){
+      $('verifyBtn').textContent='Sign in'; $('verifyBtn').disabled=false;
+      if(res.ok && res.j && res.j.token){ token=res.j.token; who=res.j.employee_name||''; localStorage.setItem('cs_token',token); localStorage.setItem('cs_name',who); enterChat(); }
+      else showErr((res.j&&res.j.error)||'Invalid code.');
+    }).catch(function(){ $('verifyBtn').textContent='Sign in'; $('verifyBtn').disabled=false; showErr('Network error.'); });
+  };
+  $('logoutBtn').onclick = function(){ localStorage.removeItem('cs_token'); localStorage.removeItem('cs_name'); token=null; history=[]; $('scroll').innerHTML=''; $('chatView').classList.add('hide'); $('loginView').classList.remove('hide'); $('step2').classList.add('hide'); $('step1').classList.remove('hide'); };
+  function bubble(role, text){
+    var row = document.createElement('div'); row.className = 'row' + (role==='me'?' me':'');
+    var b = document.createElement('div'); b.className = 'b ' + (role==='me'?'me':(role==='sys'?'sys':'them')); b.textContent = text;
+    row.appendChild(b); $('scroll').appendChild(row); $('scroll').scrollTop = $('scroll').scrollHeight; return b;
+  }
+  function enterChat(){
+    $('loginView').classList.add('hide'); $('chatView').classList.remove('hide');
+    $('who').textContent = who ? ('Signed in as '+who) : '';
+    if (!history.length){ bubble('sys', 'Hi'+(who?(' '+who.split(' ')[0]):'')+". Ask me about today's schedule, jobs, customers, or voicemails."); }
+    $('msg').focus();
+  }
+  function send(){
+    var t = $('msg').value.trim(); if(!t) return;
+    $('msg').value=''; $('msg').style.height='auto';
+    bubble('me', t); history.push({ role:'user', content:t });
+    $('typing').classList.remove('hide');
+    api('claude-chat', { messages: history, token: token }).then(function(res){
+      $('typing').classList.add('hide');
+      var reply = (res.j && (res.j.reply || res.j.error)) || 'Sorry, something went wrong.';
+      bubble('them', reply); history.push({ role:'assistant', content: reply });
+    }).catch(function(){ $('typing').classList.add('hide'); bubble('them', 'Network error — try again.'); });
+  }
+  $('send').onclick = send;
+  $('msg').addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
+  $('msg').addEventListener('keydown', function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+  if ('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+  if (token) enterChat();
+})();
+</script></body></html>
