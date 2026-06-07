@@ -1,8 +1,7 @@
 # Changelog — Carnes & Sons Owner App
 
-## v2.1.1 — 2026-06-07
-- Bottom nav clearance: floor back to 56px (S25 reports no safe-area inset in standalone, so a fixed floor is needed). Nav no longer hidden by the Android gesture bar.
+## v2.2.0 — 2026-06-07
+- Push notifications wired: enabling alerts now subscribes the device (VAPID/Web Push) and a 'Send test notification' button confirms it works. (Alert triggers — emergency/voicemail/briefing — come next.)
+- Endpoints now require login (chat, texts read/send) — safe to use on a shared URL.
 
-## v2.1.0 — Self-updating PWA + Settings/permissions hub.
-## v2.0.0 — Modern dark redesign.
-## v1.3.0 — Pull-to-refresh. ## v1.2.0 — SMS tab. ## v1.1.5 — viewport lock. ## v1.0.0 — initial.
+## v2.1.1 — bottom clearance 56px. ## v2.1.0 — self-updating + Settings. ## v2.0.0 — dark redesign. ## v1.x — SMS, Today, viewport lock, initial.
