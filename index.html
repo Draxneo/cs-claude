@@ -6,116 +6,290 @@
 <link rel="icon" href="icon.svg"/>
 <title>Carnes & Sons — Claude</title>
 <style>
+:root{--navy:#0f172a;--navy2:#1e293b;--accent:#2563eb;--accent-d:#1d4ed8;--bg:#f6f7f9;--surface:#fff;--line:#e6e8ec;--text:#0f172a;--muted:#64748b;--faint:#94a3b8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#0f172a;color:#0f172a}
-#app{display:flex;flex-direction:column;height:100dvh}
-.hdr{background:#0f172a;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;padding-top:calc(14px + env(safe-area-inset-top))}
-.hdr b{font-size:16px} .hdr .sub{font-size:12px;color:#93c5fd}
-.lk{color:#93c5fd;background:none;border:none;font-size:13px}
-.scroll{flex:1;overflow-y:auto;background:#f1f5f9;padding:14px}
-.row{display:flex;margin:8px 0} .row.me{justify-content:flex-end}
-.b{max-width:82%;padding:10px 13px;border-radius:16px;font-size:15px;line-height:1.4;white-space:pre-wrap;word-wrap:break-word}
-.b.them{background:#fff;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
-.b.me{background:#2563eb;color:#fff;border-bottom-right-radius:4px}
-.b.sys{background:#fef3c7;border:1px solid #fde68a;font-size:13px;margin:0 auto}
-.composer{display:flex;gap:8px;padding:10px;background:#fff;border-top:1px solid #e2e8f0;padding-bottom:calc(10px + env(safe-area-inset-bottom))}
-.composer textarea{flex:1;resize:none;border:1px solid #cbd5e1;border-radius:20px;padding:10px 14px;font-size:15px;max-height:120px;font-family:inherit}
-.composer button{border:none;background:#2563eb;color:#fff;border-radius:50%;width:44px;height:44px;font-size:18px;flex:none}
-.login{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#0f172a;color:#fff;padding:24px;gap:14px;text-align:center}
-.login h1{font-size:22px;margin:0} .login p{color:#94a3b8;margin:0;font-size:14px}
-.login input{width:100%;max-width:300px;padding:13px 15px;border-radius:12px;border:1px solid #334155;background:#1e293b;color:#fff;font-size:17px;text-align:center}
-.login button{width:100%;max-width:300px;padding:13px;border-radius:12px;border:none;background:#2563eb;color:#fff;font-size:16px;font-weight:600}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+#shell{display:flex;flex-direction:column;height:100dvh}
+/* App bar */
+.appbar{display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--navy);color:#fff;padding:12px 16px;padding-top:calc(12px + env(safe-area-inset-top))}
+.appbar.on{display:flex}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#2563eb,#1e3a8a);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;letter-spacing:-.03em;flex:none}
+.brand .t{line-height:1.1;min-width:0}
+.brand .t b{font-size:15px;font-weight:700}
+.brand .t span{display:block;font-size:11px;color:#93c5fd}
+.appbar .out{background:rgba(255,255,255,.12);border:none;color:#cbd5e1;font-size:12px;padding:7px 11px;border-radius:8px}
+/* Content */
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.view{display:none;padding:16px}
+.view.on{display:block}
+#view-chat.on{display:flex;flex-direction:column;padding:0;height:100%}
+/* Today */
+.hello{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:6px 2px 2px}
+.subhello{color:var(--muted);font-size:13px;margin:0 2px 18px}
+.sect{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:18px 2px 10px}
+.chips{display:flex;flex-direction:column;gap:10px}
+.chip{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 15px;font-size:15px;font-weight:600;color:var(--text);text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(15,23,42,.04);transition:transform .08s,border-color .12s}
+.chip:active{transform:scale(.985);border-color:var(--accent)}
+.chip .ic{width:38px;height:38px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.chip .cx{min-width:0}
+.chip .cx small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:1px}
+.chip .go{margin-left:auto;color:var(--faint);font-size:18px}
+/* Chat */
+.scroll{flex:1;overflow-y:auto;padding:14px;background:var(--bg)}
+.row{display:flex;margin:10px 0}
+.row.me{justify-content:flex-end}
+.bubble{max-width:84%;padding:11px 14px;border-radius:18px;font-size:15px;line-height:1.45;word-wrap:break-word;overflow-wrap:anywhere}
+.bubble.them{background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:5px;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.bubble.me{background:var(--accent);color:#fff;border-bottom-right-radius:5px}
+.bubble.sys{background:#eff6ff;border:1px solid #dbeafe;color:#1e3a8a;font-size:13.5px;max-width:100%;border-radius:12px}
+.bubble b{font-weight:700}
+.bubble ul,.bubble ol{margin:6px 0;padding-left:20px}
+.bubble li{margin:2px 0}
+.meta{display:flex;align-items:center;gap:10px;margin:2px 4px 0;font-size:11px;color:var(--faint)}
+.row.me .meta{justify-content:flex-end}
+.copy{cursor:pointer;color:var(--faint)}
+.copy:active{color:var(--accent)}
+.typing{padding:4px 16px 0;color:var(--muted);font-size:13px;font-style:italic}
+/* Composer */
+.composer{display:none;gap:8px;padding:10px;background:var(--surface);border-top:1px solid var(--line);align-items:flex-end}
+.composer.on{display:flex}
+.composer textarea{flex:1;resize:none;border:1px solid #cbd5e1;border-radius:22px;padding:11px 15px;font-size:15px;max-height:120px;font-family:inherit;line-height:1.35}
+.composer textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.iconbtn{border:none;border-radius:50%;width:46px;height:46px;font-size:19px;flex:none;display:flex;align-items:center;justify-content:center}
+.mic{background:#eef2ff;color:var(--accent)}
+.mic.rec{background:#fee2e2;color:#dc2626;animation:pulse 1.1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.snd{background:var(--accent);color:#fff}
+/* Bottom nav */
+.bnav{display:none;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.bnav.on{display:flex}
+.bnav button{flex:1;background:none;border:none;padding:9px 0 7px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--faint);font-size:11px;font-weight:600;cursor:pointer}
+.bnav button .bi{font-size:20px;line-height:1}
+.bnav button.on{color:var(--accent)}
+/* Alerts placeholder */
+.empty{text-align:center;color:var(--muted);padding:50px 24px}
+.empty .big{font-size:40px;display:block;margin-bottom:10px;opacity:.6}
+/* Login */
+.login{position:fixed;inset:0;background:var(--navy);color:#fff;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:28px;gap:14px;z-index:50}
+.login.on{display:flex}
+.login .logo{width:64px;height:64px;border-radius:16px;font-size:22px}
+.login h1{font-size:23px;margin:8px 0 0;font-weight:800}
+.login p{color:#94a3b8;margin:0;font-size:14px;max-width:300px}
+.login input{width:100%;max-width:300px;padding:14px 16px;border-radius:12px;border:1px solid #334155;background:var(--navy2);color:#fff;font-size:17px;text-align:center}
+.login input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.login button.cta{width:100%;max-width:300px;padding:14px;border-radius:12px;border:none;background:var(--accent);color:#fff;font-size:16px;font-weight:700}
+.login .link{background:none;border:none;color:#93c5fd;font-size:13px}
 .login .err{color:#fca5a5;font-size:13px;min-height:16px}
-.ver{position:fixed;bottom:10px;left:0;right:0;text-align:center;color:#475569;font-size:11px}
+.login .ver{position:fixed;bottom:12px;left:0;right:0;color:#475569;font-size:11px}
 .hide{display:none!important}
-.typing{color:#64748b;font-size:13px;padding:4px 14px}
-</style></head><body><div id="app">
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:60;pointer-events:none}
+.toast.on{opacity:.95}
+</style></head><body><div id="shell">
 
-<div id="loginView" class="login">
-  <div style="font-size:40px">🏠</div>
-  <h1>Carnes & Sons</h1>
+<header class="appbar" id="appbar">
+  <div class="brand"><div class="logo">C&amp;S</div><div class="t"><b>Carnes &amp; Sons</b><span id="who">AI Assistant</span></div></div>
+  <button class="out" id="logoutBtn">Log out</button>
+</header>
+
+<div class="content" id="content">
+
+  <section class="view" id="view-today">
+    <div class="hello" id="hello">Welcome</div>
+    <p class="subhello" id="subhello"></p>
+    <div class="sect">Quick questions</div>
+    <div class="chips" id="chips"></div>
+  </section>
+
+  <section class="view" id="view-chat">
+    <div class="scroll" id="scroll"></div>
+    <div class="typing hide" id="typing">Claude is thinking…</div>
+  </section>
+
+  <section class="view" id="view-alerts">
+    <div class="empty"><span class="big">🔔</span><b>No alerts yet</b><p style="color:var(--muted);font-size:13px">Once notifications are turned on, emergency texts, new voicemails, and your daily briefing will show up here.</p></div>
+  </section>
+
+</div>
+
+<div class="composer" id="composer">
+  <button class="iconbtn mic" id="micBtn" title="Speak">🎤</button>
+  <textarea id="msg" rows="1" placeholder="Ask Claude…"></textarea>
+  <button class="iconbtn snd" id="send">↑</button>
+</div>
+
+<nav class="bnav" id="bnav">
+  <button data-v="today"><span class="bi">🏠</span>Today</button>
+  <button data-v="chat"><span class="bi">💬</span>Chat</button>
+  <button data-v="alerts"><span class="bi">🔔</span>Alerts</button>
+</nav>
+
+</div>
+
+<div class="login on" id="login">
+  <div class="logo">C&amp;S</div>
+  <h1>Carnes &amp; Sons</h1>
   <p id="loginMsg">Sign in with your staff phone number.</p>
   <div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%">
     <input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/>
-    <button id="sendBtn">Text me a code</button>
+    <button class="cta" id="sendBtn">Text me a code</button>
   </div>
   <div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%">
     <input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/>
-    <button id="verifyBtn">Sign in</button>
-    <button class="lk" id="backBtn" style="background:none">Use a different number</button>
+    <button class="cta" id="verifyBtn">Sign in</button>
+    <button class="link" id="backBtn">Use a different number</button>
   </div>
   <div class="err" id="loginErr"></div>
-  <div class="ver">Carnes & Sons • v1.0.0</div>
+  <div class="ver">Carnes &amp; Sons • v1.1.0</div>
 </div>
 
-<div id="chatView" class="hide" style="display:flex;flex-direction:column;height:100%">
-  <div class="hdr"><div><b>Claude</b><div class="sub" id="who"></div></div><button class="lk" id="logoutBtn">Log out</button></div>
-  <div class="scroll" id="scroll"></div>
-  <div class="typing hide" id="typing">Claude is thinking…</div>
-  <div class="composer"><textarea id="msg" rows="1" placeholder="Ask about today’s schedule, voicemails…"></textarea><button id="send">↑</button></div>
-</div>
+<div class="toast" id="toast"></div>
 
-</div><script>
+<script>
 (function(){
-  var VERSION = '1.0.0';
-  var BASE = 'https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
-  var token = localStorage.getItem('cs_token');
-  var who = localStorage.getItem('cs_name') || '';
-  var phoneVal = '';
-  var history = [];
-  var $ = function(id){ return document.getElementById(id); };
-  function showErr(t){ $('loginErr').textContent = t || ''; }
-  function api(path, body){
-    return fetch(BASE + path, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) })
-      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, j:j }; }); });
-  }
-  $('sendBtn').onclick = function(){
-    var p = $('phone').value.trim(); if(!p){ showErr('Enter your phone number.'); return; }
-    if (p.indexOf('+') !== 0) { var dd = p.replace(/[^0-9]/g,''); p = (dd.length===10? '+1'+dd : '+'+dd); }
-    phoneVal = p; showErr(''); $('sendBtn').textContent='Sending…'; $('sendBtn').disabled=true;
-    api('staff-auth-request', { phone:p }).then(function(res){
-      $('sendBtn').textContent='Text me a code'; $('sendBtn').disabled=false;
-      if(res.ok){ $('step1').classList.add('hide'); $('step2').classList.remove('hide'); $('loginMsg').textContent='Enter the code we texted to '+p; $('code').focus(); }
+  var VERSION='1.1.0';
+  var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
+  var token=localStorage.getItem('cs_token');
+  var who=localStorage.getItem('cs_name')||'';
+  var phoneVal='';
+  var history=[];
+  var greeted=false;
+  var $=function(id){return document.getElementById(id);};
+  function api(path,body){return fetch(BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}).then(function(r){return r.json().catch(function(){return{};}).then(function(j){return{ok:r.ok,j:j};});});}
+  function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on');},1500);}
+
+  /* ---------- Login ---------- */
+  function showErr(t){$('loginErr').textContent=t||'';}
+  $('sendBtn').onclick=function(){
+    var p=$('phone').value.trim();if(!p){showErr('Enter your phone number.');return;}
+    if(p.indexOf('+')!==0){var d=p.replace(/[^0-9]/g,'');p=(d.length===10?'+1'+d:'+'+d);}
+    phoneVal=p;showErr('');$('sendBtn').textContent='Sending…';$('sendBtn').disabled=true;
+    api('staff-auth-request',{phone:p}).then(function(res){
+      $('sendBtn').textContent='Text me a code';$('sendBtn').disabled=false;
+      if(res.ok){$('step1').classList.add('hide');$('step2').classList.remove('hide');$('loginMsg').textContent='Enter the code we texted to '+p;$('code').focus();}
       else showErr((res.j&&res.j.error)||'Could not send a code.');
-    }).catch(function(){ $('sendBtn').textContent='Text me a code'; $('sendBtn').disabled=false; showErr('Network error.'); });
+    }).catch(function(){$('sendBtn').textContent='Text me a code';$('sendBtn').disabled=false;showErr('Network error.');});
   };
-  $('backBtn').onclick = function(){ $('step2').classList.add('hide'); $('step1').classList.remove('hide'); $('loginMsg').textContent='Sign in with your staff phone number.'; showErr(''); };
-  $('verifyBtn').onclick = function(){
-    var c = $('code').value.trim(); if(!c){ showErr('Enter the code.'); return; }
-    showErr(''); $('verifyBtn').textContent='Signing in…'; $('verifyBtn').disabled=true;
-    api('extension-otp-verify', { phone:phoneVal, code:c }).then(function(res){
-      $('verifyBtn').textContent='Sign in'; $('verifyBtn').disabled=false;
-      if(res.ok && res.j && res.j.token){ token=res.j.token; who=res.j.employee_name||''; localStorage.setItem('cs_token',token); localStorage.setItem('cs_name',who); enterChat(); }
+  $('backBtn').onclick=function(){$('step2').classList.add('hide');$('step1').classList.remove('hide');$('loginMsg').textContent='Sign in with your staff phone number.';showErr('');};
+  $('verifyBtn').onclick=function(){
+    var c=$('code').value.trim();if(!c){showErr('Enter the code.');return;}
+    showErr('');$('verifyBtn').textContent='Signing in…';$('verifyBtn').disabled=true;
+    api('extension-otp-verify',{phone:phoneVal,code:c}).then(function(res){
+      $('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;
+      if(res.ok&&res.j&&res.j.token){token=res.j.token;who=res.j.employee_name||'';localStorage.setItem('cs_token',token);localStorage.setItem('cs_name',who);enterApp();}
       else showErr((res.j&&res.j.error)||'Invalid code.');
-    }).catch(function(){ $('verifyBtn').textContent='Sign in'; $('verifyBtn').disabled=false; showErr('Network error.'); });
+    }).catch(function(){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;showErr('Network error.');});
   };
-  $('logoutBtn').onclick = function(){ localStorage.removeItem('cs_token'); localStorage.removeItem('cs_name'); token=null; history=[]; $('scroll').innerHTML=''; $('chatView').classList.add('hide'); $('loginView').classList.remove('hide'); $('step2').classList.add('hide'); $('step1').classList.remove('hide'); };
-  function bubble(role, text){
-    var row = document.createElement('div'); row.className = 'row' + (role==='me'?' me':'');
-    var b = document.createElement('div'); b.className = 'b ' + (role==='me'?'me':(role==='sys'?'sys':'them')); b.textContent = text;
-    row.appendChild(b); $('scroll').appendChild(row); $('scroll').scrollTop = $('scroll').scrollHeight; return b;
+  $('logoutBtn').onclick=function(){localStorage.removeItem('cs_token');localStorage.removeItem('cs_name');token=null;history=[];greeted=false;$('scroll').innerHTML='';location.reload();};
+
+  /* ---------- App shell ---------- */
+  function enterApp(){
+    $('login').classList.remove('on');
+    $('appbar').classList.add('on');$('bnav').classList.add('on');
+    $('who').textContent=(who?who:'Owner')+' · v'+VERSION;
+    var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+    var first=who?who.split(' ')[0]:'';
+    $('hello').textContent=part+(first?(', '+first):'');
+    $('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    buildChips();
+    setView('today');
   }
-  function enterChat(){
-    $('loginView').classList.add('hide'); $('chatView').classList.remove('hide');
-    $('who').textContent = (who ? ('Signed in as '+who+' • ') : '') + 'v'+VERSION;
-    if (!history.length){ bubble('sys', 'Hi'+(who?(' '+who.split(' ')[0]):'')+". Ask me about today's schedule, jobs, customers, or voicemails."); }
-    $('msg').focus();
+  function setView(v){
+    ['today','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});
+    document.querySelectorAll('.bnav button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===v);});
+    $('composer').classList.toggle('on',v==='chat');
+    if(v==='chat'){ if(!greeted){greeted=true;bubble('sys','Ask me anything about today — the schedule, a customer, voicemails, or whether we can fit a job in.');} setTimeout(function(){$('msg').focus();},50); }
   }
-  function send(){
-    var t = $('msg').value.trim(); if(!t) return;
-    $('msg').value=''; $('msg').style.height='auto';
-    bubble('me', t); history.push({ role:'user', content:t });
-    $('typing').classList.remove('hide');
-    api('claude-chat', { messages: history, token: token }).then(function(res){
+  document.querySelectorAll('.bnav button').forEach(function(b){b.onclick=function(){setView(b.getAttribute('data-v'));};});
+
+  /* ---------- Today chips ---------- */
+  var CHIPS=[
+    {ic:'🗓️',t:"Today's schedule",q:'How does today’s schedule look? Who is going where?'},
+    {ic:'📞',t:'Voicemails',s:'Anything I haven’t seen',q:'Are there any new voicemails or missed calls I should know about?'},
+    {ic:'👷',t:'Who’s working',q:'Who is working today and what are they assigned to?'},
+    {ic:'📝',t:'New estimates',q:'Any new or open estimates I should follow up on?'},
+    {ic:'📍',t:'Can we fit a job?',s:'Tell me the ZIP',q:'Can we fit in a new service call today in ZIP '}
+  ];
+  function buildChips(){
+    var w=$('chips');w.innerHTML='';
+    CHIPS.forEach(function(c){
+      var b=document.createElement('button');b.className='chip';
+      b.innerHTML='<span class="ic">'+c.ic+'</span><span class="cx">'+c.t+(c.s?('<small>'+c.s+'</small>'):'')+'</span><span class="go">›</span>';
+      b.onclick=function(){ setView('chat'); if(c.q.slice(-1)===' '){ $('msg').value=c.q; $('msg').focus(); auto(); } else { send(c.q); } };
+      w.appendChild(b);
+    });
+  }
+
+  /* ---------- Chat ---------- */
+  function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function mdToHtml(t){
+    var lines=esc(t).split('\n');var out='';var inUl=false,inOl=false;
+    function closeLists(){if(inUl){out+='</ul>';inUl=false;}if(inOl){out+='</ol>';inOl=false;}}
+    for(var i=0;i<lines.length;i++){
+      var ln=lines[i];
+      var mUl=ln.match(/^\s*[-•]\s+(.*)/);
+      var mOl=ln.match(/^\s*\d+[.)]\s+(.*)/);
+      if(mUl){if(!inUl){closeLists();out+='<ul>';inUl=true;}out+='<li>'+inline(mUl[1])+'</li>';}
+      else if(mOl){if(!inOl){closeLists();out+='<ol>';inOl=true;}out+='<li>'+inline(mOl[1])+'</li>';}
+      else{closeLists();if(ln.trim()==='')out+='<br/>';else out+=inline(ln)+'<br/>';}
+    }
+    closeLists();return out;
+  }
+  function inline(s){return s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*]+)\*/g,'$1<b>$2</b>');}
+  function nowTime(){return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+  function bubble(role,text){
+    var row=document.createElement('div');row.className='row'+(role==='me'?' me':'');
+    var b=document.createElement('div');b.className='bubble '+(role==='me'?'me':(role==='sys'?'sys':'them'));
+    if(role==='them')b.innerHTML=mdToHtml(text);else b.textContent=text;
+    row.appendChild(b);
+    if(role!=='sys'){
+      var m=document.createElement('div');m.className='meta';
+      var ts=document.createElement('span');ts.textContent=nowTime();m.appendChild(ts);
+      if(role==='them'){var cp=document.createElement('span');cp.className='copy';cp.textContent='Copy';cp.onclick=function(){navigator.clipboard.writeText(text).then(function(){toast('Copied');});};m.appendChild(cp);}
+      row.appendChild(document.createElement('div'));row.lastChild.appendChild(m);row.lastChild.className=(role==='me'?'':'')+'';
+      // place meta under bubble
+      var wrap=document.createElement('div');wrap.style.width='100%';wrap.appendChild(m);
+    }
+    $('scroll').appendChild(row);
+    if(role!=='sys'){var mw=document.createElement('div');mw.style.width='100%';var mm=document.createElement('div');mm.className='meta'+(role==='me'?'':'');}
+    // simpler: append meta as sibling line
+    if(role!=='sys'){
+      var line=document.createElement('div');line.className='row'+(role==='me'?' me':'');line.style.margin='0';
+      var meta=document.createElement('div');meta.className='meta';meta.style.maxWidth='84%';
+      var t2=document.createElement('span');t2.textContent=nowTime();meta.appendChild(t2);
+      if(role==='them'){var c2=document.createElement('span');c2.className='copy';c2.textContent='Copy';c2.onclick=function(){navigator.clipboard.writeText(text).then(function(){toast('Copied');});};meta.appendChild(c2);}
+      line.appendChild(meta);$('scroll').appendChild(line);
+    }
+    $('scroll').scrollTop=$('scroll').scrollHeight;return b;
+  }
+  function send(t){
+    t=(t||'').trim();if(!t)return;
+    $('msg').value='';auto();
+    bubble('me',t);history.push({role:'user',content:t});
+    $('typing').classList.remove('hide');$('scroll').scrollTop=$('scroll').scrollHeight;
+    api('claude-chat',{messages:history,token:token}).then(function(res){
       $('typing').classList.add('hide');
-      var reply = (res.j && (res.j.reply || res.j.error)) || 'Sorry, something went wrong.';
-      bubble('them', reply); history.push({ role:'assistant', content: reply });
-    }).catch(function(){ $('typing').classList.add('hide'); bubble('them', 'Network error — try again.'); });
+      var reply=(res.j&&(res.j.reply||res.j.error))||'Sorry, something went wrong.';
+      bubble('them',reply);history.push({role:'assistant',content:reply});
+    }).catch(function(){$('typing').classList.add('hide');bubble('them','Network error — try again.');});
   }
-  $('send').onclick = send;
-  $('msg').addEventListener('input', function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,120)+'px'; });
-  $('msg').addEventListener('keydown', function(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
-  if ('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
-  if (token) enterChat();
+  function auto(){var m=$('msg');m.style.height='auto';m.style.height=Math.min(m.scrollHeight,120)+'px';}
+  $('send').onclick=function(){send($('msg').value);};
+  $('msg').addEventListener('input',auto);
+  $('msg').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send($('msg').value);}});
+
+  /* ---------- Mic (voice to text) ---------- */
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var rec=null,recOn=false;
+  if(!SR){$('micBtn').style.display='none';}
+  else{
+    rec=new SR();rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=1;
+    rec.onresult=function(e){var tx=e.results[0][0].transcript;$('msg').value=($('msg').value?($('msg').value+' '):'')+tx;auto();};
+    rec.onend=function(){recOn=false;$('micBtn').classList.remove('rec');};
+    rec.onerror=function(){recOn=false;$('micBtn').classList.remove('rec');};
+    $('micBtn').onclick=function(){if(recOn){rec.stop();return;}try{rec.start();recOn=true;$('micBtn').classList.add('rec');$('msg').focus();}catch(_e){}};
+  }
+
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+  if(token)enterApp();
 })();
 </script></body></html>
