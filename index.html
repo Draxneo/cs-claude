@@ -196,6 +196,7 @@ svg{display:block}.icn{width:22px;height:22px}
   $('smsBack').onclick=function(){setView('sms');};
   $('smsDraft').onclick=smartDraftSms;
   $('smsSummarize').onclick=function(){vib(10);var tr=smsThreadTranscript();setView('chat');sendChat('Here is my current text thread with '+(smsOpenName||fmtPhone(smsOpenPhone))+':\n\n'+tr+'\n\nSummarize it and tell me the single best next action.');};
+
   function refreshNotifPill(){var p=$('notifPill');if(!('Notification' in window)){p.textContent='N/A';return;}var g=Notification.permission==='granted';p.textContent=g?'On':'Off';p.className='pill '+(g?'on':'off');}
   $('enableNotifs').onclick=function(){if(!('Notification' in window)){toast('Notifications not supported');return;}Notification.requestPermission().then(function(perm){refreshNotifPill();if(perm==='granted'){toast('Notifications enabled');subscribePush();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}}else{toast('Permission was not granted');}});};
   $('testNotif').onclick=function(){if(!('Notification' in window)||Notification.permission!=='granted'){toast('Enable notifications first');return;}subscribePush();toast('Sending test…');api('push-send',{token:token,title:'Carnes & Sons',body:'Test alert — notifications are working.',url:'index.html'}).then(function(res){if(res.j&&res.j.ok&&res.j.sent>0)toast('Test sent — check your shade');else toast('No device registered yet — reopen + retry');});};
