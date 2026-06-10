@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Carnes & Sons — Instant Quote</title>
+<style>
+:root{--navy:#0c1b2a;--green:#15c172;--ink:#0c1b2a;--muted:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--card:#fff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);padding:24px 16px}
+.wrap{max-width:1080px;margin:0 auto}
+.topline{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--muted);margin-bottom:8px}
+.bar{height:6px;border-radius:99px;background:#dbe3ec;overflow:hidden;margin-bottom:18px}
+.bar>i{display:block;height:100%;background:var(--green);width:0;transition:width .4s}
+.steps{display:flex;gap:6px;margin-bottom:26px;flex-wrap:wrap}
+.steps>div{flex:1;min-width:120px;display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;font-weight:700;font-size:14px;color:var(--muted);background:transparent}
+.steps>div.on{background:#e4ebf2;color:var(--ink)}
+.steps>div.done{color:var(--ink)}
+.steps .n{width:26px;height:26px;border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:13px;background:#cbd5e1;color:#fff;flex-shrink:0}
+.steps>div.on .n,.steps>div.done .n{background:var(--navy)}
+.q{display:flex;align-items:center;gap:12px;font-size:24px;font-weight:800;margin-bottom:20px}
+.q .n{width:34px;height:34px;border-radius:99px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.opt{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;transition:.15s;text-align:left}
+.opt:hover{border-color:#94a3b8}
+.opt.sel{border-color:var(--navy);box-shadow:0 4px 14px rgba(12,27,42,.12)}
+.opt h3{font-size:19px;margin-bottom:6px}
+.opt p{font-size:14px;color:var(--muted);line-height:1.4}
+.opt .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.hint{background:#eef2f7;border-radius:10px;padding:13px 16px;color:var(--muted);font-size:14px;margin-top:18px}
+.nav{display:flex;justify-content:space-between;margin-top:26px}
+.btn{border:none;border-radius:10px;padding:13px 22px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px}
+.btn.back{background:#fff;border:1px solid var(--line);color:var(--muted)}
+.btn.next{background:var(--navy);color:#fff}
+.btn.next:disabled{background:#cbd5e1;cursor:not-allowed}
+.btn.go{background:var(--green);color:#fff;font-size:17px;padding:15px 28px}
+.foot{text-align:center;color:#94a3b8;font-size:12px;font-weight:700;letter-spacing:.08em;margin-top:30px;text-transform:uppercase}
+/* result */
+.price{background:var(--card);border-radius:16px;padding:28px;box-shadow:0 6px 24px rgba(12,27,42,.1)}
+.price .tier{font-size:14px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:.06em}
+.price .big{font-size:46px;font-weight:800;margin:6px 0}
+.price .sub{color:var(--muted);font-size:15px;margin-bottom:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.cell{background:#f6f9fc;border:1px solid var(--line);border-radius:12px;padding:14px}
+.cell .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cell .v{font-size:20px;font-weight:800;margin-top:2px}
+.cell .v.green{color:var(--green)}
+.spec{font-size:13px;color:var(--muted);margin-top:4px}
+.lead{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+.lead input{flex:1;min-width:160px;padding:13px;border:1px solid var(--line);border-radius:10px;font-size:15px}
+.techbox{background:#0c1b2a;color:#cbd5e1;border-radius:12px;padding:16px;margin-top:16px;font-size:14px}
+.techbox b{color:#fff}
+.techrow{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #1e3247}
+a.cert{color:var(--green);font-weight:700;text-decoration:none}
+.spin{text-align:center;padding:40px;color:var(--muted)}
+</style></head><body><div class="wrap" id="app"></div>
+<script>
+var API="https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/quoter";
+var TECH=new URLSearchParams(location.search).get("mode")==="tech";
+var TIERS_BY_BRAND={Goodman:[["essential","Essential Comfort","Reliable cooling, great value, proven for Texas homes."],["reliable","Reliable Comfort","Goodman's higher-efficiency S5 platform."]],
+Carrier:[["reliable","Reliable Comfort","Quieter, tighter build — the Carrier name, entry tier."],["enhanced","Enhanced Comfort","Two-stage cooling — gentler runtimes, lower bills."],["signature","Signature Comfort","Variable-speed inverter — quietest, best humidity control."],["ultimate","Ultimate Comfort","Flagship inverter heat pump — most efficient we install."]]};
+function brandKey(brand,tier){if(brand==="Goodman")return tier==="essential"?"goodman":"goodman-s5";return ({reliable:"carrier-comfort",enhanced:"carrier-performance",signature:"carrier-infinity",ultimate:"carrier-greenspeed"})[tier];}
+var SIZES=[[2,"≈ 1,000 sqft"],[2.5,"≈ 1,300 sqft"],[3,"≈ 1,600 sqft"],[3.5,"≈ 1,900 sqft"],[4,"≈ 2,200 sqft"],[5,"≈ 2,800 sqft"]];
+var HEATS=[["gas","Gas","AC + gas furnace — most common in SA"],["heat-pump","Heat Pump","Heats & cools, no gas line needed"],["electric","Electric","AC + electric air handler"]];
+var s={step:0,brand:null,tonnage:null,heat:null,tier:null,result:null,cust:{}};
+var STEPS=["Brand","Size","Heat","Comfort"];
+var el=document.getElementById("app");
+function money(n){return n==null?"—":"$"+Number(n).toLocaleString("en-US");}
+function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c];});}
+function header(){var pct=s.result?100:Math.round(s.step/4*100);
+ var st=STEPS.map(function(t,i){var cls=i===s.step&&!s.result?"on":(i<s.step||s.result?"done":"");return '<div class="'+cls+'"><span class="n">'+(i+1)+'</span>'+t+'</div>';}).join("");
+ return '<div class="topline"><span>'+(s.result?"YOUR ESTIMATE IS READY":"STEP "+(s.step+1)+" OF 4")+'</span><span>'+pct+'%</span></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="steps">'+st+'</div>';}
+function card(sel,title,sub,tag,onclick){return '<div class="opt'+(sel?' sel':'')+'" onclick="'+onclick+'">'+(tag?'<span class="tag">'+tag+'</span>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p></div>';}
+function render(){
+ if(s.result){return renderResult();}
+ var body="",valid=false;
+ if(s.step===0){body='<div class="q"><span class="n">1</span>Which brand are you considering?</div><div class="opts">'+
+   card(s.brand==="Goodman","Goodman","Best value — Essential & Reliable comfort tiers","",'pick("brand","Goodman")')+
+   card(s.brand==="Carrier","Carrier","Premium build — Reliable through Ultimate tiers","",'pick("brand","Carrier")')+
+   '</div><div class="hint">Goodman covers Essential & Reliable. Carrier covers Reliable through Ultimate Comfort.</div>';valid=!!s.brand;}
+ else if(s.step===1){body='<div class="q"><span class="n">2</span>What size system?</div><div class="opts">'+
+   SIZES.map(function(z){return card(s.tonnage===z[0],z[0]+" Ton",z[1],"",'pick("tonnage",'+z[0]+')');}).join("")+
+   '</div><div class="hint">Not sure? Pick the closest to your home\'s square footage — we confirm the exact size on site.</div>';valid=s.tonnage!=null;}
+ else if(s.step===2){body='<div class="q"><span class="n">3</span>Heating type?</div><div class="opts">'+
+   HEATS.map(function(h){return card(s.heat===h[0],h[1],h[2],"",'pick("heat","'+h[0]+'")');}).join("")+
+   '</div>';valid=!!s.heat;}
+ else if(s.step===3){var tiers=TIERS_BY_BRAND[s.brand]||[];body='<div class="q"><span class="n">4</span>Which comfort level?</div><div class="opts">'+
+   tiers.map(function(t){return card(s.tier===t[0],t[1],t[2],s.brand,'pick("tier","'+t[0]+'")');}).join("")+
+   '</div><div class="hint">These map to a specific equipment platform — we show you which on the next screen.</div>';valid=!!s.tier;}
+ var nextLabel=s.step===3?"See my price":"Next";var nextFn=s.step===3?"submitQuote()":"go(1)";
+ el.innerHTML=header()+body+'<div class="nav"><button class="btn back" onclick="go(-1)"'+(s.step===0?" disabled":"")+'>← Back</button>'+
+   '<button class="btn '+(s.step===3?"go":"next")+'" onclick="'+nextFn+'"'+(valid?"":" disabled")+'>'+nextLabel+' →</button></div>'+
+   '<div class="foot">Sample preview · answer above for your real price</div>';
+}
+function pick(k,v){s[k]=v;if(k==="brand")s.tier=null;render();}
+function go(d){if(d>0&&s.step<3)s.step++;else if(d<0&&s.step>0)s.step--;render();}
+function submitQuote(){el.innerHTML=header()+'<div class="spin">Building your estimate…</div>';
+ fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"price",brand_key:brandKey(s.brand,s.tier),heat:s.heat,tonnage:s.tonnage})})
+ .then(function(r){return r.json();}).then(function(q){if(!q||!q.ok){el.innerHTML=header()+'<div class="price"><p>Sorry — we couldn\'t price that combination. Please text Clint at (210) 600-5091 and we\'ll get you a number fast.</p></div>';return;}s.result=q;render();})
+ .catch(function(){el.innerHTML=header()+'<div class="price"><p>Connection hiccup. Please try again.</p></div>';});}
+function renderResult(){var q=s.result,p=q.price||{},eq=q.equipment||{};
+ var common='<div class="tier">'+esc(q.tierLabel)+' · '+esc(s.brand)+'</div><div class="big">'+money(p.cash)+'</div><div class="sub">Cash price, installed'+(q.tonnage_bumped?' · sized up to '+q.effective_tonnage+' ton for this tier':'')+(q.fallback?' · Greenspeed is heat-pump only — showing Infinity':'')+'</div>';
+ if(TECH){var cost=eq.btu;var box='<div class="techbox"><div class="techrow"><span>AHRI #</span><b>'+esc(eq.ahri_number||"—")+'</b></div>'+
+   '<div class="techrow"><span>Equipment</span><b>'+esc(eq.brand||"")+' '+esc(eq.condenser_model||"")+'</b></div>'+
+   '<div class="techrow"><span>SEER2 / EER2 / HSPF2</span><b>'+esc(eq.seer2||"—")+' / '+esc(eq.eer2||"—")+' / '+esc(eq.hspf2||"—")+'</b></div>'+
+   '<div class="techrow"><span>Sticker / Cash</span><b>'+money(p.sticker)+' / '+money(p.cash)+'</b></div>'+
+   '<div class="techrow"><span>CPS early / burnout</span><b>'+money(p.cps_early)+' / '+money(p.cps_burnout)+'</b></div>'+
+   (eq.ahri_cert_url?'<div style="margin-top:8px"><a class="cert" href="'+esc(eq.ahri_cert_url)+'" target="_blank">↓ AHRI Certificate (PDF)</a></div>':'')+'</div>';
+  el.innerHTML=header()+'<div class="price">'+common+box+
+   '<div class="lead"><input id="cn" placeholder="Customer name"><input id="cp" placeholder="Phone"><input id="ca" placeholder="Address + ZIP"></div>'+
+   '<div class="nav"><button class="btn back" onclick="restart()">← New quote</button><button class="btn go" onclick="techSubmit()">Send to office for approval →</button></div></div>';
+ } else {
+  el.innerHTML=header()+'<div class="price">'+common+
+   '<div class="grid2">'+
+   '<div class="cell"><div class="l">Factory rebate</div><div class="v green">-'+money(p.factory_rebate)+'</div></div>'+
+   '<div class="cell"><div class="l">CPS Energy rebate (you file)</div><div class="v green">up to '+money(Math.max(p.cps_early||0,p.cps_burnout||0))+'</div></div>'+
+   '<div class="cell"><div class="l">36-mo financing</div><div class="v">'+money(p.monthly_36)+'/mo</div></div>'+
+   '<div class="cell"><div class="l">120-mo (9.99% APR)</div><div class="v">'+money(p.monthly_120)+'/mo</div></div>'+
+   '</div>'+
+   '<div class="spec">'+esc(eq.brand||"")+' system · '+esc(eq.seer2||"")+' SEER2'+(eq.hspf2?' · '+esc(eq.hspf2)+' HSPF2':'')+' · AHRI certified matchup</div>'+
+   '<div class="lead"><input id="cn" placeholder="Your name"><input id="cp" placeholder="Phone"><button class="btn go" onclick="leadSubmit()">Lock in this price →</button></div>'+
+   '<div class="nav"><button class="btn back" onclick="restart()">← Start over</button></div></div>';
+ }
+}
+function gather(){return {name:(document.getElementById("cn")||{}).value||"",phone:(document.getElementById("cp")||{}).value||"",address:(document.getElementById("ca")||{}).value||""};}
+function flat(){var q=s.result,p=q.price||{};return {tierLabel:q.tierLabel,tonnage:q.effective_tonnage,brand:s.brand,cash:p.cash};}
+function techSubmit(){var c=gather();el.innerHTML=header()+'<div class="spin">Sending to office…</div>';
+ fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"submit",payload:{brand_key:brandKey(s.brand,s.tier),heat:s.heat,tonnage:s.tonnage,customer:c,notes:"Submitted from tech quoter"}})})
+ .then(function(r){return r.json();}).then(function(x){el.innerHTML=header()+'<div class="price"><div class="tier">Sent ✓</div><div class="sub" style="margin-top:10px">Quote is in the office Proposals queue for approval'+(x.customer_matched?' — matched to '+esc(x.customer_matched):'')+'.</div><div class="nav"><button class="btn go" onclick="restart()">New quote →</button></div></div>';})
+ .catch(function(){el.innerHTML=header()+'<div class="price"><p>Send failed — try again.</p></div>';});}
+function leadSubmit(){var c=gather();if(!c.phone){alert("Add a phone so we can send your price.");return;}
+ fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"lead",customer:c,quote:flat()})})
+ .then(function(){el.innerHTML=header()+'<div class="price"><div class="tier">Got it ✓</div><div class="big" style="font-size:30px">We\'ll text you</div><div class="sub">Clint will confirm your price and answer any questions. Talk soon!</div><div class="nav"><button class="btn back" onclick="restart()">← New quote</button></div></div>';});}
+function restart(){s={step:0,brand:null,tonnage:null,heat:null,tier:null,result:null,cust:{}};render();}
+render();
+</script></body></html>
