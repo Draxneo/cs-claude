@@ -66,7 +66,7 @@ function esc(x){return String(x==null?"":x).replace(/[&<>"]/g,function(c){return
 function header(){var pct=s.result?100:Math.round(s.step/4*100);
  var st=STEPS.map(function(t,i){var cls=i===s.step&&!s.result?"on":(i<s.step||s.result?"done":"");return '<div class="'+cls+'"><span class="n">'+(i+1)+'</span>'+t+'</div>';}).join("");
  return '<div class="topline"><span>'+(s.result?"YOUR ESTIMATE IS READY":"STEP "+(s.step+1)+" OF 4")+'</span><span>'+pct+'%</span></div><div class="bar"><i style="width:'+pct+'%"></i></div><div class="steps">'+st+'</div>';}
-function card(sel,title,sub,tag,onclick){return '<div class="opt'+(sel?' sel':'')+'" onclick="'+onclick+'">'+(tag?'<span class="tag">'+tag+'</span>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p></div>';}
+function card(sel,title,sub,tag,onclick){return '<div class="opt'+(sel?' sel':'')+'" onclick=\''+onclick+'\'>'+(tag?'<span class="tag">'+tag+'</span>':'')+'<h3>'+esc(title)+'</h3><p>'+esc(sub)+'</p></div>';}
 function render(){
  if(s.result){return renderResult();}
  var body="",valid=false;
