@@ -1,3 +1,6 @@
+## v2.12.0 (2026-06-10)
+- Mobile keyboard fix: the on-screen keyboard now overlays the bottom of the app instead of shoving the whole screen up off-view. Added viewport `interactive-widget=resizes-content` so the layout shrinks to the visible area (header stays put, conversation stays readable, message box sits right above the keyboard). Bumped message box font to 16px to stop the iOS focus zoom-jump.
+
 ## v2.11.0 (2026-06-09)
 - Open SMS thread now refreshes every 3s (dedicated poller w/ change-check, no flicker) to match the extension.
 - Confirmed ::CHIPS:: tap-buttons already parsed/rendered in Claude tab (parity verified).
