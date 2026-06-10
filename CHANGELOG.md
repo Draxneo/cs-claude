@@ -1,3 +1,7 @@
+## v2.11.0 (2026-06-09)
+- Open SMS thread now refreshes every 3s (dedicated poller w/ change-check, no flicker) to match the extension.
+- Confirmed ::CHIPS:: tap-buttons already parsed/rendered in Claude tab (parity verified).
+
 # Changelog — Carnes & Sons Owner App
 
 ## v2.3.0 — 2026-06-07
