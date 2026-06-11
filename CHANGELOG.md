@@ -1,3 +1,6 @@
+## v2.21.0 (2026-06-11)
+- Tap a voicemail in the Inbox to jump to the Calls tab and play it; voicemail summaries now wrap fully in the Inbox.
+
 ## v2.20.0 (2026-06-11)
 - Voicemails now show a purple VOICEMAIL badge in the Calls tab so they stand out from answered calls (they also land in the Inbox with a push).
 
