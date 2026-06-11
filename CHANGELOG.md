@@ -1,3 +1,6 @@
+## v2.26.0 (2026-06-11)
+- Truck mode is now full hands-free: in the Claude chat, finish talking and it sends automatically, then reads the reply aloud — no tapping. (SMS still requires a tap to send, on purpose.)
+
 ## v2.25.0 (2026-06-11)
 - Conversation list now flags unread threads (accent bar + bold name + count) and marks landline numbers (call-only), matching the desktop side panel.
 
