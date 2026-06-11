@@ -1,3 +1,6 @@
+## v2.20.0 (2026-06-11)
+- Voicemails now show a purple VOICEMAIL badge in the Calls tab so they stand out from answered calls (they also land in the Inbox with a push).
+
 ## v2.19.0 (2026-06-10)
 - Claude can now fix customer details (name, email, phone) on request — added a 'Fix a customer detail' suggestion. Confirms the change before saving.
 
