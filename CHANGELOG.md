@@ -1,3 +1,6 @@
+## v2.18.0 (2026-06-10)
+- More Claude suggestions on the Home tab (look up a customer, book a job, renewals due) and a broader chat greeting, so the newer abilities are discoverable.
+
 ## v2.17.0 (2026-06-10)
 - Draft & Summarize now share the same line as the 'In Housecall Pro' tag instead of taking their own row — shorter header, more room for messages.
 
