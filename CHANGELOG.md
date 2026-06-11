@@ -1,3 +1,6 @@
+## v2.22.0 (2026-06-11)
+- Leads now show a 🎯 icon in the Inbox; tap one to open the conversation and text or call them.
+
 ## v2.21.0 (2026-06-11)
 - Tap a voicemail in the Inbox to jump to the Calls tab and play it; voicemail summaries now wrap fully in the Inbox.
 
