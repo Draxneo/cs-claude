@@ -13,7 +13,7 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:non
 #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 svg{display:block}.icn{width:22px;height:22px}
 .appbar{display:none;align-items:center;justify-content:space-between;gap:8px;background:rgba(11,17,32,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);color:#fff;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));flex:none}
-.appbar.on{display:flex}
+.appbar.on{display:flex}body.no-appbar #content{padding-top:env(safe-area-inset-top)}
 .brand{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
 .logo{width:34px;height:34px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;color:#08101f;letter-spacing:-.5px;flex:none;box-shadow:0 4px 14px rgba(34,211,238,.3)}
 .brand .t{line-height:1.15;min-width:0}.brand .t b{font-size:15px;font-weight:700}.brand .t span{display:block;font-size:11px;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -117,7 +117,7 @@ svg{display:block}.icn{width:22px;height:22px}
 .toast{position:fixed;bottom:calc(86px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--line);color:#fff;padding:9px 16px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .2s;z-index:90;pointer-events:none}
 .toast.on{opacity:1}
 </style></head><body><div id="shell">
-<header class="appbar" id="appbar"><div class="brand"><div class="logo">C&amp;S</div><div class="t"><b>Carnes &amp; Sons</b><span id="who">AI Assistant</span></div></div><button class="out" id="refreshBtn" title="Check for update">↻</button><button class="out" id="logoutBtn">Log out</button></header>
+<header class="appbar" id="appbar"><div class="brand"><div class="logo">C&amp;S</div><div class="t"><b>Carnes &amp; Sons</b><span id="who">AI Assistant</span></div></div><button class="out" id="refreshBtn" title="Check for update">↻</button></header>
 <div id="ptr">↓ Pull to refresh app</div>
 <div class="content" id="content">
   <section class="view" id="view-today"><div class="hero"><svg class="deco" viewBox="0 0 100 100" fill="none" stroke="#34d3ee" stroke-width="3" stroke-linecap="round"><circle cx="50" cy="50" r="14"/><path d="M50 6v18M50 76v18M6 50h18M76 50h18M19 19l13 13M68 68l13 13M81 19L68 32M32 68L19 81"/></svg><h1 class="hi" id="hello">Welcome</h1><p class="dt" id="subhello"></p></div><div class="sect">Quick questions</div><div class="chips" id="chips"></div></section>
@@ -133,6 +133,8 @@ svg{display:block}.icn{width:22px;height:22px}
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
     <div class="card"><h3>Version <span class="pill on" id="verPill">v2.11.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="sect">Account</div>
+    <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
 </div>
 <div class="composer" id="composer"><button class="iconbtn mic" id="autospeakBtn" title="Auto-read replies aloud (truck mode)"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8a5 5 0 010 8M18.5 6a8 8 0 010 12"/></svg></button><button class="iconbtn mic" id="micBtn" title="Speak"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg></button><textarea id="msg" rows="1" placeholder="Ask Claude…"></textarea><button class="iconbtn snd" id="send"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>
@@ -151,7 +153,7 @@ svg{display:block}.icn{width:22px;height:22px}
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.15.0';
+  var VERSION='2.16.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -190,8 +192,8 @@ svg{display:block}.icn{width:22px;height:22px}
   $('verifyBtn').onclick=function(){var c=$('code').value.trim();if(!c){showErr('Enter the code.');return;}showErr('');$('verifyBtn').textContent='Signing in…';$('verifyBtn').disabled=true;api('extension-otp-verify',{phone:phoneVal,code:c}).then(function(res){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;if(res.ok&&res.j&&res.j.token){token=res.j.token;who=res.j.employee_name||'';localStorage.setItem('cs_token',token);localStorage.setItem('cs_name',who);enterApp();}else showErr((res.j&&res.j.error)||'Invalid code.');}).catch(function(){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;showErr('Network error.');});};
   $('logoutBtn').onclick=function(){localStorage.removeItem('cs_token');localStorage.removeItem('cs_name');location.reload();};
 
-  function enterApp(){$('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');$('who').textContent=(who?who:'Owner')+' · v'+VERSION;var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';$('hello').textContent=part+(first?(', '+first):'');$('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}if(('Notification' in window)&&Notification.permission==='granted')subscribePush();updateInboxBadge();setView('today');}
-  function setView(v){view=v;['today','sms','smsthread','inbox','calls','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});document.querySelectorAll('.bnav button').forEach(function(b){var bv=b.getAttribute('data-v');b.classList.toggle('on',bv===v||(v==='smsthread'&&bv==='sms'));});$('composer').classList.toggle('on',v==='chat'||v==='smsthread');if(v==='chat'){$('msg').placeholder='Ask Claude…';if(!greeted){greeted=true;bubble('sys','Ask me anything about today — the schedule, a customer, voicemails, or whether we can fit a job in.',$('scroll'));}setTimeout(function(){$('msg').focus();},50);}if(v==='sms'){loadSmsList();}if(v==='smsthread'){$('msg').placeholder='Text '+(smsOpenName||fmtPhone(smsOpenPhone))+'…';setTimeout(function(){$('msg').focus();},50);}if(v==='inbox'){loadInbox();}if(v==='calls'){loadCalls(false);}if(v==='alerts'){refreshNotifPill();}}
+  function enterApp(){$('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');$('who').textContent=(who?who:'Owner')+' · v'+VERSION;var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';$('hello').textContent=part+(first?(', '+first):'');var __an=$('acctName');if(__an)__an.textContent=(who||'Owner');$('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}if(('Notification' in window)&&Notification.permission==='granted')subscribePush();updateInboxBadge();setView('today');}
+  function setView(v){view=v;$('appbar').classList.toggle('on',v==='today');document.body.classList.toggle('no-appbar',v!=='today');['today','sms','smsthread','inbox','calls','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});document.querySelectorAll('.bnav button').forEach(function(b){var bv=b.getAttribute('data-v');b.classList.toggle('on',bv===v||(v==='smsthread'&&bv==='sms'));});$('composer').classList.toggle('on',v==='chat'||v==='smsthread');if(v==='chat'){$('msg').placeholder='Ask Claude…';if(!greeted){greeted=true;bubble('sys','Ask me anything about today — the schedule, a customer, voicemails, or whether we can fit a job in.',$('scroll'));}setTimeout(function(){$('msg').focus();},50);}if(v==='sms'){loadSmsList();}if(v==='smsthread'){$('msg').placeholder='Text '+(smsOpenName||fmtPhone(smsOpenPhone))+'…';setTimeout(function(){$('msg').focus();},50);}if(v==='inbox'){loadInbox();}if(v==='calls'){loadCalls(false);}if(v==='alerts'){refreshNotifPill();}}
   document.querySelectorAll('.bnav button').forEach(function(b){b.onclick=function(){vib(8);setView(b.getAttribute('data-v'));};});
   $('smsBack').onclick=function(){setView('sms');};
   $('smsDraft').onclick=smartDraftSms;

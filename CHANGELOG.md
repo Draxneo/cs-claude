@@ -1,3 +1,6 @@
+## v2.16.0 (2026-06-10)
+- Cleaner screens: the 'Carnes & Sons' top bar now only appears on the Home tab. Moved Log out to the Alerts/settings page (Account section). Other tabs get the full height with no header.
+
 ## v2.15.0 (2026-06-10)
 - Compacted the text-thread header: tighter name/avatar bar, slimmer 'In Housecall Pro' row, and smaller Draft/Summarize buttons — more room for the actual conversation.
 
