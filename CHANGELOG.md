@@ -1,3 +1,6 @@
+## v2.15.0 (2026-06-10)
+- Compacted the text-thread header: tighter name/avatar bar, slimmer 'In Housecall Pro' row, and smaller Draft/Summarize buttons — more room for the actual conversation.
+
 ## v2.14.0 (2026-06-10)
 - Keyboard now hides the bottom tab bar while you're typing, so the conversation isn't crushed into a sliver and the message box sits right on top of the keyboard. Auto-scrolls to the newest message when the keyboard opens.
 
