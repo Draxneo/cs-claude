@@ -1,3 +1,6 @@
+## v2.23.0 (2026-06-11)
+- Customer info now shows the phone line type (mobile = textable, landline = call only) so you know before you try to text.
+
 ## v2.22.0 (2026-06-11)
 - Leads now show a 🎯 icon in the Inbox; tap one to open the conversation and text or call them.
 
