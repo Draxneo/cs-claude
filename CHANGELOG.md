@@ -1,3 +1,6 @@
+## v2.17.0 (2026-06-10)
+- Draft & Summarize now share the same line as the 'In Housecall Pro' tag instead of taking their own row — shorter header, more room for messages.
+
 ## v2.16.0 (2026-06-10)
 - Cleaner screens: the 'Carnes & Sons' top bar now only appears on the Home tab. Moved Log out to the Alerts/settings page (Account section). Other tabs get the full height with no header.
 

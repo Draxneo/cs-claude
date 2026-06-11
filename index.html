@@ -104,9 +104,9 @@ svg{display:block}.icn{width:22px;height:22px}
 .chipbtn{background:var(--surface2);border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:700;padding:8px 13px;border-radius:16px;cursor:pointer}
 .chipbtn.sm{font-weight:600;font-size:12px;padding:6px 11px;border-color:var(--line);color:var(--text)}
 .chipbtn:active{transform:scale(.96)}.actbar .chipbtn{font-size:12px;padding:5px 11px;border-radius:13px}
-.actbar{display:none;gap:6px;flex-wrap:wrap;padding:5px 10px;border-bottom:1px solid var(--line);background:var(--surface);align-items:center;flex:none}
-.actbar.on{display:flex}
-.ibox{background:var(--surface);border-bottom:1px solid var(--line);padding:4px 12px;font-size:12px;flex:none}
+.actbar{display:none;gap:6px;flex-wrap:wrap;padding:5px 12px 5px 6px;border-bottom:1px solid var(--line);background:var(--surface);align-items:flex-start;flex:none}
+.actbar.on{display:flex}.inforow{display:flex;align-items:stretch}.inforow>#smsInfo{flex:1;min-width:0;display:flex}
+.ibox{background:var(--surface);border-bottom:1px solid var(--line);padding:4px 12px;font-size:12px;flex:1}
 .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--muted)}
 .tag.ok{background:rgba(52,211,238,.15);color:var(--accent)}.tag.warn{background:rgba(251,191,36,.18);color:#fbbf24}
 .isub{color:var(--muted);font-size:12px;margin-top:3px}
@@ -122,7 +122,7 @@ svg{display:block}.icn{width:22px;height:22px}
 <div class="content" id="content">
   <section class="view" id="view-today"><div class="hero"><svg class="deco" viewBox="0 0 100 100" fill="none" stroke="#34d3ee" stroke-width="3" stroke-linecap="round"><circle cx="50" cy="50" r="14"/><path d="M50 6v18M50 76v18M6 50h18M76 50h18M19 19l13 13M68 68l13 13M81 19L68 32M32 68L19 81"/></svg><h1 class="hi" id="hello">Welcome</h1><p class="dt" id="subhello"></p></div><div class="sect">Quick questions</div><div class="chips" id="chips"></div></section>
   <section class="view" id="view-sms"><div id="sms-list"><div class="loading">Loading conversations…</div></div></section>
-  <section class="view" id="view-smsthread"><div class="smshead"><button class="bk" id="smsBack"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="av" id="smsAv">#</div><div><div class="nm" id="smsName"></div><div class="ph" id="smsPhone"></div></div><button class="callbtn" id="smsCall" title="Call"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l1.5 5-2 1a11 11 0 005 5l1-2 5 1.5V21a1 1 0 01-1 1A17 17 0 014 6a1 1 0 011-2z"/></svg></button></div><div id="smsInfo"></div><div class="actbar" id="smsActions"><button class="chipbtn" id="smsDraft">✍️ Draft</button><button class="chipbtn" id="smsSummarize">✨ Summarize</button><span id="smsDraftChips" style="display:flex;gap:6px;flex-wrap:wrap"></span></div><div class="scroll" id="sms-scroll"></div></section>
+  <section class="view" id="view-smsthread"><div class="smshead"><button class="bk" id="smsBack"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button><div class="av" id="smsAv">#</div><div><div class="nm" id="smsName"></div><div class="ph" id="smsPhone"></div></div><button class="callbtn" id="smsCall" title="Call"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l1.5 5-2 1a11 11 0 005 5l1-2 5 1.5V21a1 1 0 01-1 1A17 17 0 014 6a1 1 0 011-2z"/></svg></button></div><div class="inforow"><div id="smsInfo"></div><div class="actbar" id="smsActions"><button class="chipbtn" id="smsDraft">✍️ Draft</button><button class="chipbtn" id="smsSummarize">✨ Summarize</button><span id="smsDraftChips" style="display:flex;gap:6px;flex-wrap:wrap"></span></div></div><div class="scroll" id="sms-scroll"></div></section>
   <section class="view" id="view-inbox"></section>
   <section class="view" id="view-calls"></section>
   <section class="view" id="view-chat"><div class="scroll" id="scroll"></div><div class="typing hide" id="typing">Claude is thinking…</div></section>
@@ -153,7 +153,7 @@ svg{display:block}.icn{width:22px;height:22px}
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.16.0';
+  var VERSION='2.17.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
