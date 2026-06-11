@@ -1,3 +1,6 @@
+## v2.24.0 (2026-06-11)
+- Claude chat now shows context-aware starter buttons: open a text thread first and the chips become Draft reply / Summarize / Book / History for that person; otherwise the general quick actions. Fewer taps, less typing.
+
 ## v2.23.0 (2026-06-11)
 - Customer info now shows the phone line type (mobile = textable, landline = call only) so you know before you try to text.
 
