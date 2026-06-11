@@ -1,5 +1,5 @@
 // Carnes & Sons PWA service worker — versioned cache + network-first so updates apply.
-var V='2.18.0';var CACHE='cs-'+V;var CORE=['index.html','manifest.webmanifest','icon.svg'];
+var V='2.19.0';var CACHE='cs-'+V;var CORE=['index.html','manifest.webmanifest','icon.svg'];
 self.addEventListener('install',function(e){self.skipWaiting();e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(CORE).catch(function(){});}));});
 self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){if(k!==CACHE)return caches.delete(k);}));}).then(function(){return self.clients.claim();}));});
 self.addEventListener('message',function(e){if(e.data==='skipWaiting')self.skipWaiting();});

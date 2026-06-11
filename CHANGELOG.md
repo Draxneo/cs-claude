@@ -1,3 +1,6 @@
+## v2.19.0 (2026-06-10)
+- Claude can now fix customer details (name, email, phone) on request — added a 'Fix a customer detail' suggestion. Confirms the change before saving.
+
 ## v2.18.0 (2026-06-10)
 - More Claude suggestions on the Home tab (look up a customer, book a job, renewals due) and a broader chat greeting, so the newer abilities are discoverable.
 
