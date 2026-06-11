@@ -1,3 +1,6 @@
+## v2.25.0 (2026-06-11)
+- Conversation list now flags unread threads (accent bar + bold name + count) and marks landline numbers (call-only), matching the desktop side panel.
+
 ## v2.24.0 (2026-06-11)
 - Claude chat now shows context-aware starter buttons: open a text thread first and the chips become Draft reply / Summarize / Book / History for that person; otherwise the general quick actions. Fewer taps, less typing.
 
