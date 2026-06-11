@@ -1,3 +1,6 @@
+## v2.14.0 (2026-06-10)
+- Keyboard now hides the bottom tab bar while you're typing, so the conversation isn't crushed into a sliver and the message box sits right on top of the keyboard. Auto-scrolls to the newest message when the keyboard opens.
+
 ## v2.13.0 (2026-06-10)
 - Listen to replies aloud: every Claude answer (and the thread highlights) now has a Listen button with play/pause and a stop button — great for hands-free over the truck's Bluetooth. Added an Auto-read 'truck mode' toggle in the message bar: turn it on and new replies play automatically.
 
