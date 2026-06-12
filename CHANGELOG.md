@@ -1,3 +1,6 @@
+## v2.34.0 (2026-06-12) — compact, Google-Messages-style thread header
+- The customer info box (HCP status, address, phone type, open estimates) and the Draft / Summarize / Book buttons are now collapsed by default in a text thread — the header is just back, avatar, name + number, and call. Tap the contact name (chevron next to it) to expand details and actions; collapses again on each newly opened thread.
+- Also includes v2.33.x fixes: bottom nav no longer hides under the Samsung system bar (the app now sizes itself off the real visible window height — 100dvh lies on Samsung standalone), measured bottom padding, launch-settle re-measurement, self-healing nav, and tap-the-version diagnostics (home header subtitle or Alerts version pill).
 ## v2.33.0 (2026-06-12)
 - Bottom nav no longer hides under Android's 3-button (software) navigation bar. There's no API to detect 3-button nav and Chrome reports a zero bottom inset there even when drawing behind the bar, so the app now measures it: real inset reported → use it (gesture phones); zero inset but the app window fills the whole screen → we must be behind the bar, pad 48px; window shorter than the screen (desktop) → no padding, no dead space. Toast and login footer follow the same measured padding.
 
