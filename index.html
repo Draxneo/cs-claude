@@ -7,7 +7,7 @@
 <title>Carnes & Sons — Claude</title>
 <script src="https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.18.3/dist/twilio.min.js"></script>
 <style>
-:root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:max(env(safe-area-inset-bottom),56px)}
+:root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);position:fixed;width:100%}
 #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
@@ -108,7 +108,12 @@ svg{display:block}.icn{width:22px;height:22px}
 .chipbtn.sm{font-weight:600;font-size:12px;padding:6px 11px;border-color:var(--line);color:var(--text)}
 .chipbtn:active{transform:scale(.96)}.actbar .chipbtn{font-size:12px;padding:5px 11px;border-radius:13px}
 .actbar{display:none;gap:6px;flex-wrap:wrap;padding:5px 12px 5px 6px;border-bottom:1px solid var(--line);background:var(--surface);align-items:flex-start;flex:none}
-.actbar.on{display:flex}.inforow{display:flex;align-items:stretch}.inforow>#smsInfo{flex:1;min-width:0;display:flex}
+.actbar.on{display:flex}
+/* Info + action chips sit side-by-side ONLY when there's room: the info box claims at least
+   230px before the chip row wraps to its own full-width line below. On a phone the chips used
+   to squeeze the customer info into a one-word-per-line sliver (it only looked right on the
+   wide desktop window). */
+.inforow{display:flex;flex-wrap:wrap;align-items:stretch}.inforow>#smsInfo{flex:1 1 230px;min-width:0;display:flex}
 .ibox{background:var(--surface);border-bottom:1px solid var(--line);padding:4px 12px;font-size:12px;flex:1}
 .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--muted)}
 .tag.ok{background:rgba(52,211,238,.15);color:var(--accent)}.tag.warn{background:rgba(251,191,36,.18);color:#fbbf24}
@@ -136,7 +141,7 @@ svg{display:block}.icn{width:22px;height:22px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.30.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.31.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
@@ -153,12 +158,12 @@ svg{display:block}.icn{width:22px;height:22px}
 </nav>
 </div>
 <div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.30.0</div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.31.0</div></div>
 <div class="lb hide" id="lb"></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.30.0';
+  var VERSION='2.31.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';

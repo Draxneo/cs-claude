@@ -1,3 +1,7 @@
+## v2.31.0 (2026-06-12) — phone layout fixes
+- Thread header: customer info no longer gets crushed into a one-word-per-line left sliver on phones — the Draft/Summarize/Book chips now wrap below the info box when the screen is too narrow (side-by-side stays on wide screens).
+- Removed the hardcoded 56px dead space under the bottom nav — bottom padding now only appears on phones that actually have a gesture/home-indicator bar.
+
 ## v2.30.0 (2026-06-12) — audit fixes round 1
 - **Flicker fixed**: the 20s poller no longer rebuilds the open text thread (the 3s change-detecting poller owns it), the Texts/Team lists no longer flash "Loading…" every 20 seconds, and lists only repaint when something actually changed.
 - **Bottom nav can no longer get stuck hidden**: the keyboard-detector now only hides the nav while you're actually typing in a text box, and it's force-cleared when you leave a chat/thread. Landscape keeps its navigation.
