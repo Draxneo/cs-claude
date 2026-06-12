@@ -1,3 +1,6 @@
+## v2.29.0 (2026-06-12)
+- New **Team** tab in the bottom nav. Messages from your techs and subcontractors (AP Hernandez, etc.) now live in their own tab, separated out of the customer SMS list so the two never get mixed up. Same single fetch powers both lists, so switching tabs is instant.
+
 ## v2.28.0 (2026-06-12)
 - Texts list now shows the team member's name (with their role) for threads with a tech — matching the Chrome extension — instead of falling back to a raw phone number.
 
