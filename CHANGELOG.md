@@ -1,3 +1,6 @@
+## v2.33.0 (2026-06-12)
+- Bottom nav no longer hides under Android's 3-button (software) navigation bar. There's no API to detect 3-button nav and Chrome reports a zero bottom inset there even when drawing behind the bar, so the app now measures it: real inset reported → use it (gesture phones); zero inset but the app window fills the whole screen → we must be behind the bar, pad 48px; window shorter than the screen (desktop) → no padding, no dead space. Toast and login footer follow the same measured padding.
+
 ## v2.32.1 (2026-06-12)
 - Audio players (Calls view, voice notes in threads) now render dark to match the theme — Chrome's native controls ignore dark-mode hints, so they're inverted via CSS filter.
 
