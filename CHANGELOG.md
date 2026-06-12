@@ -1,3 +1,6 @@
+## v2.27.0 (2026-06-12)
+- Added a 📅 Book button to the SMS thread, and the Calls list Book button now always shows (not just when a call has an AI summary).
+
 ## v2.26.0 (2026-06-11)
 - Truck mode is now full hands-free: in the Claude chat, finish talking and it sends automatically, then reads the reply aloud — no tapping. (SMS still requires a tap to send, on purpose.)
 
