@@ -1,3 +1,6 @@
+## v2.32.1 (2026-06-12)
+- Audio players (Calls view, voice notes in threads) now render dark to match the theme — Chrome's native controls ignore dark-mode hints, so they're inverted via CSS filter.
+
 ## v2.32.0 (2026-06-12) — full phone-width comb of every view
 - Audited all 8 views + thread detail at a true 390px phone width with an automated overflow/tap-target detector. No layout overflow found anywhere after v2.31 — remaining issues were all small touch targets, now fixed:
 - Bigger thumb targets everywhere: thread Back button (30→42px) and Call button (34→42px), all action chips (Draft/Summarize/Book, draft tweaks, chat starters) now ≥34-38px tall, Inbox ✓/Book/✗ row buttons padded up, "Refresh" and "+ To-do" header buttons are real targets instead of 17px text.
