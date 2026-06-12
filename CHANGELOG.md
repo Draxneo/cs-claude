@@ -1,3 +1,9 @@
+## v2.32.0 (2026-06-12) — full phone-width comb of every view
+- Audited all 8 views + thread detail at a true 390px phone width with an automated overflow/tap-target detector. No layout overflow found anywhere after v2.31 — remaining issues were all small touch targets, now fixed:
+- Bigger thumb targets everywhere: thread Back button (30→42px) and Call button (34→42px), all action chips (Draft/Summarize/Book, draft tweaks, chat starters) now ≥34-38px tall, Inbox ✓/Book/✗ row buttons padded up, "Refresh" and "+ To-do" header buttons are real targets instead of 17px text.
+- The Draft/Summarize/Book chip row's background band now spans the full width when it wraps below the customer info.
+- Native controls (audio players on Calls, scrollbars) now render in dark mode (`color-scheme: dark`) instead of clashing white.
+
 ## v2.31.0 (2026-06-12) — phone layout fixes
 - Thread header: customer info no longer gets crushed into a one-word-per-line left sliver on phones — the Draft/Summarize/Book chips now wrap below the info box when the screen is too narrow (side-by-side stays on wide screens).
 - Removed the hardcoded 56px dead space under the bottom nav — bottom padding now only appears on phones that actually have a gesture/home-indicator bar.

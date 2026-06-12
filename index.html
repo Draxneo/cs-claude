@@ -7,7 +7,7 @@
 <title>Carnes & Sons — Claude</title>
 <script src="https://cdn.jsdelivr.net/npm/@twilio/voice-sdk@2.18.3/dist/twilio.min.js"></script>
 <style>
-:root{--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:env(safe-area-inset-bottom,0px)}
+:root{color-scheme:dark;--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);position:fixed;width:100%}
 #shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
@@ -52,9 +52,9 @@ svg{display:block}.icn{width:22px;height:22px}
 .thread .tx .pre{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
 .thread .tm{color:var(--faint);font-size:11px;flex:none;align-self:flex-start;margin-top:3px}
 .smshead{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
-.smshead .bk{background:none;border:none;color:var(--accent);padding:4px;flex:none;display:flex}
+.smshead .bk{background:none;border:none;color:var(--accent);padding:4px;flex:none;display:flex;align-items:center;justify-content:center;min-width:42px;min-height:42px}
 .smshead .av{width:28px;height:28px;font-size:12px}.smshead .nm{font-size:14px;font-weight:700;line-height:1.1}.smshead .ph{font-size:12px;color:var(--muted)}
-.smshead .callbtn{margin-left:auto;background:var(--surface2);border:1px solid var(--line);color:var(--accent);width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.smshead .callbtn{margin-left:auto;background:var(--surface2);border:1px solid var(--line);color:var(--accent);width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
 .smshead .callbtn:active{background:var(--accent);color:#08101f}
 .scroll{flex:1 1 auto;overflow-y:auto;padding:14px;min-height:0}
 .row{display:flex;margin:8px 0 0}.row.me{justify-content:flex-end}
@@ -104,10 +104,15 @@ svg{display:block}.icn{width:22px;height:22px}
 .callscreen .cbtn.mute{background:var(--surface2);border:1px solid var(--line);color:var(--text)}
 .callscreen .cbtn.mute.on{background:var(--accent);color:#08101f;border-color:var(--accent)}
 .callscreen .cbtn.end{background:#f43f5e}
-.chipbtn{background:var(--surface2);border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:700;padding:8px 13px;border-radius:16px;cursor:pointer}
-.chipbtn.sm{font-weight:600;font-size:12px;padding:6px 11px;border-color:var(--line);color:var(--text)}
-.chipbtn:active{transform:scale(.96)}.actbar .chipbtn{font-size:12px;padding:5px 11px;border-radius:13px}
-.actbar{display:none;gap:6px;flex-wrap:wrap;padding:5px 12px 5px 6px;border-bottom:1px solid var(--line);background:var(--surface);align-items:flex-start;flex:none}
+/* min-height keeps every chip a comfortable thumb target (~38px+) — audit found 27-35px chips */
+.chipbtn{background:var(--surface2);border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:700;padding:9px 14px;border-radius:18px;cursor:pointer;min-height:38px}
+.chipbtn.sm{font-weight:600;font-size:12px;padding:7px 12px;border-color:var(--line);color:var(--text);min-height:34px}
+.chipbtn:active{transform:scale(.96)}.actbar .chipbtn{font-size:12px;padding:8px 12px;border-radius:15px;min-height:36px}
+/* Header text-buttons (Refresh / + To-do) were 17px tall — pad them into real targets */
+#calls-refresh,#inbox-todo{padding:10px 8px!important;min-height:38px}
+/* Inbox row action buttons (✓ / ✓ Book / ✗) — inline styles set small padding, so !important */
+.ibtn-done{padding:9px 14px!important}.ibtn-approve{padding:8px 12px!important}.ibtn-reject{padding:8px 11px!important}
+.actbar{display:none;gap:6px;flex-wrap:wrap;padding:5px 12px 5px 6px;border-bottom:1px solid var(--line);background:var(--surface);align-items:flex-start;flex:1 1 auto}
 .actbar.on{display:flex}
 /* Info + action chips sit side-by-side ONLY when there's room: the info box claims at least
    230px before the chip row wraps to its own full-width line below. On a phone the chips used
@@ -141,7 +146,7 @@ svg{display:block}.icn{width:22px;height:22px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.31.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.32.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
@@ -158,12 +163,12 @@ svg{display:block}.icn{width:22px;height:22px}
 </nav>
 </div>
 <div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.31.0</div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.32.0</div></div>
 <div class="lb hide" id="lb"></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.31.0';
+  var VERSION='2.32.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
