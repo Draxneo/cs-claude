@@ -1,3 +1,8 @@
+## v2.35.0 (2026-06-12) — native Messages feel
+- Date separators in text threads: "Today / Yesterday / Wed, Jun 10" dividers between messages from different days.
+- Delivery ticks under your sent texts: … sending, (one check) sent, (two checks, teal) delivered, warning if a text failed to deliver.
+- Long-press any message bubble (half a second) to copy its text — with a haptic confirm, like Google Messages.
+- Haptic feedback on every button and conversation row across the whole app.
 ## v2.34.0 (2026-06-12) — compact, Google-Messages-style thread header
 - The customer info box (HCP status, address, phone type, open estimates) and the Draft / Summarize / Book buttons are now collapsed by default in a text thread — the header is just back, avatar, name + number, and call. Tap the contact name (chevron next to it) to expand details and actions; collapses again on each newly opened thread.
 - Also includes v2.33.x fixes: bottom nav no longer hides under the Samsung system bar (the app now sizes itself off the real visible window height — 100dvh lies on Samsung standalone), measured bottom padding, launch-settle re-measurement, self-healing nav, and tap-the-version diagnostics (home header subtitle or Alerts version pill).
