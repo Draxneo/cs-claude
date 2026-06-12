@@ -10,7 +10,12 @@
 :root{color-scheme:dark;--bg:#0b1120;--surface:#121a2b;--surface2:#1a2436;--line:#26324a;--text:#e8eef7;--muted:#9fb0c7;--faint:#5f7187;--accent:#34d3ee;--accent2:#3b82f6;--grad:linear-gradient(135deg,#22d3ee,#3b82f6);--safe-b:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg);position:fixed;width:100%}
-#shell{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+/* --apph is set by JS to window.innerHeight: on Samsung (S25 confirmed) standalone PWAs,
+   100dvh resolves to screen-minus-status-bar (754) while the actually-VISIBLE window is
+   innerHeight (697) — the difference is the system button bar, and the bottom nav rendered
+   inside that invisible strip. innerHeight never lies about what's visible. dvh is only the
+   fallback until JS runs. */
+#shell{display:flex;flex-direction:column;height:100vh;height:100dvh;height:var(--apph,100dvh);overflow:hidden}
 svg{display:block}.icn{width:22px;height:22px}
 .appbar{display:none;align-items:center;justify-content:space-between;gap:8px;background:rgba(11,17,32,.85);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);color:#fff;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top));flex:none}
 .appbar.on{display:flex}body.no-appbar #content{padding-top:env(safe-area-inset-top)}
@@ -149,7 +154,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.33.3</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.33.4</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
@@ -166,12 +171,12 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 </nav>
 </div>
 <div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.33.3</div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.33.4</div></div>
 <div class="lb hide" id="lb"></div>
 <div class="toast" id="toast"></div>
 <script>
 (function(){
-  var VERSION='2.33.3';
+  var VERSION='2.33.4';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -305,6 +310,9 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
         if(gap<48)pad=48;
       }
       document.documentElement.style.setProperty('--safe-b',Math.round(pad)+'px');
+      // Size the shell off the REAL visible height (see #shell CSS comment) — keyboard
+      // resizes flow through here too via the resize listener, matching dvh behavior.
+      document.documentElement.style.setProperty('--apph',window.innerHeight+'px');
     }catch(_e){}
   }
   // Measure at startup AND re-measure after the launch settles (Android can report a wrong
