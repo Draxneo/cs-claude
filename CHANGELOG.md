@@ -1,3 +1,14 @@
+## v2.36.0 (2026-06-12) — the big usability batch
+- **Send photos from your phone**: new attach button in the text-thread composer — pick a photo, see the preview, send as MMS (uses the same upload pipe as the desktop extension).
+- **Never miss a message while scrolled up**: a "New message" pill appears instead of silently holding the update; tap to jump to the newest.
+- **Failed texts say so**: a send that fails marks itself "not delivered — tap to retry" right on the bubble.
+- **Search conversations**: search boxes on the Texts and Team tabs filter by name, number, or message text.
+- **Unread badges** on the Texts and Team tabs, matching the Inbox counter.
+- **Calls tab**: every call card now has a Call button next to Text/Book, and recordings show their length up front.
+- **Pull-to-refresh refreshes in place** on Texts/Team/Inbox (no more full app restart; Home still pulls the newest app version).
+- Battery: all background polling pauses while the app is hidden, and the screen refreshes instantly when you come back.
+- Offline banner when the connection drops; auto-refresh on reconnect.
+- Friendlier "All caught up" Inbox empty state; login footer no longer overlaps the button on small screens; proper PNG home-screen icons (sharper on Android launchers).
 ## v2.35.0 (2026-06-12) — native Messages feel
 - Date separators in text threads: "Today / Yesterday / Wed, Jun 10" dividers between messages from different days.
 - Delivery ticks under your sent texts: … sending, (one check) sent, (two checks, teal) delivered, warning if a text failed to deliver.
