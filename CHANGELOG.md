@@ -1,3 +1,12 @@
+## v2.30.0 (2026-06-12) — audit fixes round 1
+- **Flicker fixed**: the 20s poller no longer rebuilds the open text thread (the 3s change-detecting poller owns it), the Texts/Team lists no longer flash "Loading…" every 20 seconds, and lists only repaint when something actually changed.
+- **Bottom nav can no longer get stuck hidden**: the keyboard-detector now only hides the nav while you're actually typing in a text box, and it's force-cleared when you leave a chat/thread. Landscape keeps its navigation.
+- **Android back button works**: back now goes thread → list → previous tab instead of closing the app.
+- **Compose box**: auto-grows cleanly without an inner scrollbar until it hits max height; a draft typed in a text thread no longer leaks into the Claude chat box (and vice versa).
+- **Security**: esc() now escapes quotes (a hostile caller name can no longer inject HTML via attributes); the image lightbox is DOM-built instead of innerHTML.
+- **Service worker**: only caches good (200) responses — a transient GitHub Pages error can no longer get cached and leave you stuck on a broken screen; offline fallback to the app shell now only applies to page loads, not images/audio.
+- Slimmer styled scrollbars on desktop; view switches reset scroll position to the top.
+
 ## v2.29.0 (2026-06-12)
 - New **Team** tab in the bottom nav. Messages from your techs and subcontractors (AP Hernandez, etc.) now live in their own tab, separated out of the customer SMS list so the two never get mixed up. Same single fetch powers both lists, so switching tabs is instant.
 
