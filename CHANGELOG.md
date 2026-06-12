@@ -1,3 +1,6 @@
+## v2.28.0 (2026-06-12)
+- Texts list now shows the team member's name (with their role) for threads with a tech — matching the Chrome extension — instead of falling back to a raw phone number.
+
 ## v2.27.0 (2026-06-12)
 - Added a 📅 Book button to the SMS thread, and the Calls list Book button now always shows (not just when a call has an AI summary).
 
