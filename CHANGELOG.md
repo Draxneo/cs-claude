@@ -1,3 +1,6 @@
+## v2.37.0 (2026-06-12) — "text them on the number they asked for"
+- When a caller or texter mentions a DIFFERENT phone number ("text me at 210-555-1234"), a dashed teal button appears automatically: on call cards ("They mentioned (210) 555-1234 — text that number") and at the bottom of a text thread when the customer's messages mention another number. One tap opens a thread to that number.
+- Never suggests our own business/forwarding lines; max two suggestions per card/thread.
 ## v2.36.0 (2026-06-12) — the big usability batch
 - **Send photos from your phone**: new attach button in the text-thread composer — pick a photo, see the preview, send as MMS (uses the same upload pipe as the desktop extension).
 - **Never miss a message while scrolled up**: a "New message" pill appears instead of silently holding the update; tap to jump to the newest.
