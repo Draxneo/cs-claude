@@ -1,3 +1,6 @@
+## v2.38.0 (2026-06-12)
+- Truck mode now tells Claude it's being read aloud: replies come back as short spoken sentences (times in words, no bullets/links/symbols) instead of formatted text. The text-to-speech also strips warning glyphs, dividers, and URLs it used to read out loud.
+
 ## v2.37.0 (2026-06-12) — "text them on the number they asked for"
 - When a caller or texter mentions a DIFFERENT phone number ("text me at 210-555-1234"), a dashed teal button appears automatically: on call cards ("They mentioned (210) 555-1234 — text that number") and at the bottom of a text thread when the customer's messages mention another number. One tap opens a thread to that number.
 - Never suggests our own business/forwarding lines; max two suggestions per card/thread.
