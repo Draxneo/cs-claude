@@ -1,3 +1,6 @@
+## v2.39.0 (2026-06-12) — financing chips
+- When financing comes up in a text thread, green chips appear: "Explain financing" (Claude drafts the Synchrony 5.9%/9.9% promo explanation + the 26% APR reassurance), "Send Synchrony link", and "Send FTL link". Link chips drop a ready message into the composer for you to review and send.
+
 ## v2.38.0 (2026-06-12)
 - Truck mode now tells Claude it's being read aloud: replies come back as short spoken sentences (times in words, no bullets/links/symbols) instead of formatted text. The text-to-speech also strips warning glyphs, dividers, and URLs it used to read out loud.
 
