@@ -1,3 +1,6 @@
+## v2.42.2 (2026-06-14) — tap-to-confirm (no more popup box)
+- Approving a booking or a move no longer opens a browser OK/Cancel box. The button itself asks for a second tap: tap "✓ Book"/"✓ Move" once and it turns amber and says "Tap to confirm"; tap again to actually do it. It reverts on its own after a few seconds if you don't. Errors show on the button instead of a popup.
+
 ## v2.42.1 (2026-06-14) — cleaner booking approval
 - The Approve confirmation for a queued booking no longer shows the appointment twice. It used to print the title and an identical "preview" line, which looked like two bookings. New booking/move cards now carry a short action line under the title, and the confirm box shows the appointment once.
 
