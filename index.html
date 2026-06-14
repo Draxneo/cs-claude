@@ -171,7 +171,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.40.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.41.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
@@ -188,13 +188,13 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 </nav>
 </div>
 <div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.40.0</div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.41.0</div></div>
 <div class="lb hide" id="lb"></div>
 <div class="toast" id="toast"></div>
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.40.0';
+  var VERSION='2.41.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -296,7 +296,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   var inboxItems=null;
   function updateInboxBadge(){inboxApi('counts').then(function(d){var n=(d.counts&&d.counts.unseen)||0;var el=$('inbox-badge');if(el){el.textContent=n;el.style.display=n>0?'':'none';}try{if(navigator.setAppBadge){if(n>0)navigator.setAppBadge(n);else if(navigator.clearAppBadge)navigator.clearAppBadge();}}catch(_e){}});}
   function loadInbox(){var w=$('view-inbox');if(w&&!inboxItems)w.innerHTML='<div class="loading">Loading inbox…</div>';inboxApi('list').then(function(d){inboxItems=(d.items)||[];renderInbox();var n=inboxItems.filter(function(i){return i.status==='unseen';}).length;var el=$('inbox-badge');if(el){el.textContent=n;el.style.display=n>0?'':'none';}});}
-  function renderInbox(){var w=$('view-inbox');if(!w)return;var items=inboxItems||[];var ICO={sms:'💬',voicemail:'📞',missed_call:'📵',after_hours:'🌙',todo:'✅',booking_approval:'📅',email:'📧',lead:'🎯'};var head='<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px"><div class="sect" style="margin:0">Inbox · '+items.length+'</div><button id="inbox-todo" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600">+ To-do</button></div>';var bodyHtml=items.length?items.map(function(it){var unseen=it.status==='unseen';var _vmPre=it.kind==='voicemail'?' style="white-space:normal;-webkit-line-clamp:unset"':'';var urg=it.urgency==='high'?' <span style="background:#f43f5e;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">URGENT</span>':'';return '<div class="thread" data-inbox-id="'+esc(it.id)+'" style="'+(unseen?'background:rgba(52,211,238,0.06)':'')+'"><div class="av" style="background:'+avColor(it.customer_name||it.title||it.kind)+';font-size:18px">'+((it.payload&&it.payload.icon)||ICO[it.kind]||'•')+'</div><div class="tx"><div class="nm">'+esc(it.title||it.customer_name||it.customer_phone||it.kind)+urg+'</div><div class="pre"'+_vmPre+'>'+esc(it.preview||'')+'</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex:none"><div class="tm">'+timeShort(it.created_at)+'</div>'+(it.kind==='booking_approval'?'<button class="ibtn-approve" data-id="'+esc(it.id)+'" style="background:var(--accent);border:none;color:#06121f;font-size:12px;font-weight:800;padding:5px 10px;border-radius:9px">✓ Book</button><button class="ibtn-reject" data-id="'+esc(it.id)+'" style="background:var(--surface2);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:700;padding:5px 9px;border-radius:9px">✗</button>':'<button class="ibtn-done" data-id="'+esc(it.id)+'" style="background:var(--surface2);border:1px solid var(--line);color:var(--accent);font-size:13px;font-weight:700;padding:4px 11px;border-radius:9px">✓</button>')+'</div></div>';}).join(''):'<div class="loading" style="font-size:15px;padding:48px 24px">🎉 All caught up!<br/><span style="font-size:12.5px;color:var(--faint)">Nothing needs your attention right now.</span></div>';w.innerHTML=head+bodyHtml;var tb=$('inbox-todo');if(tb)tb.onclick=function(){vib(8);var t=prompt('New to-do:');if(t&&t.trim()){inboxApi('todo',{title:t.trim()}).then(loadInbox);}};var unseenIds=items.filter(function(i){return i.status==='unseen';}).map(function(i){return i.id;});if(unseenIds.length)inboxApi('seen',{ids:unseenIds}).then(updateInboxBadge);w.querySelectorAll('.ibtn-done').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(12);inboxApi('handle',{id:b.getAttribute('data-id')}).then(loadInbox);};});w.querySelectorAll('.ibtn-approve').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(12);var it=(inboxItems||[]).find(function(x){return x.id===b.getAttribute('data-id');});if(!confirm('Approve and book this in Housecall Pro?\n\n'+((it&&it.title)||'')+'\n'+((it&&it.preview)||'')))return;b.disabled=true;b.textContent='…';inboxApi('approve_booking',{id:b.getAttribute('data-id')}).then(function(r){if(r&&r.ok){vib(20);loadInbox();}else{b.disabled=false;b.textContent='✓ Book';alert('Couldn\'t book: '+((r&&r.error)||'error'));}});};});w.querySelectorAll('.ibtn-reject').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(8);if(!confirm('Reject this queued booking? It will be removed without booking.'))return;inboxApi('handle',{id:b.getAttribute('data-id')}).then(loadInbox);};});w.querySelectorAll('[data-inbox-id]').forEach(function(row){row.onclick=function(){var it=(inboxItems||[]).find(function(x){return x.id===row.getAttribute('data-inbox-id');});if(it&&it.kind==='email'&&it.payload&&it.payload.link){window.open(it.payload.link,'_blank');}else if(it&&it.kind==='sms'&&it.customer_phone){openThread(it.customer_phone,it.customer_name||'');}else if(it&&it.kind==='voicemail'){setView('calls');}else if(it&&it.kind==='lead'&&it.customer_phone){openThread(it.customer_phone,it.customer_name||'');}};});}
+  function renderInbox(){var w=$('view-inbox');if(!w)return;var items=inboxItems||[];var ICO={sms:'💬',voicemail:'📞',missed_call:'📵',after_hours:'🌙',todo:'✅',booking_approval:'📅',reschedule_approval:'🔁',email:'📧',lead:'🎯'};var head='<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 16px 8px"><div class="sect" style="margin:0">Inbox · '+items.length+'</div><button id="inbox-todo" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600">+ To-do</button></div>';var bodyHtml=items.length?items.map(function(it){var unseen=it.status==='unseen';var _vmPre=it.kind==='voicemail'?' style="white-space:normal;-webkit-line-clamp:unset"':'';var urg=it.urgency==='high'?' <span style="background:#f43f5e;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px">URGENT</span>':'';return '<div class="thread" data-inbox-id="'+esc(it.id)+'" style="'+(unseen?'background:rgba(52,211,238,0.06)':'')+'"><div class="av" style="background:'+avColor(it.customer_name||it.title||it.kind)+';font-size:18px">'+((it.payload&&it.payload.icon)||ICO[it.kind]||'•')+'</div><div class="tx"><div class="nm">'+esc(it.title||it.customer_name||it.customer_phone||it.kind)+urg+'</div><div class="pre"'+_vmPre+'>'+esc(it.preview||'')+'</div></div><div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex:none"><div class="tm">'+timeShort(it.created_at)+'</div>'+((it.kind==='booking_approval'||it.kind==='reschedule_approval')?'<button class="ibtn-approve" data-id="'+esc(it.id)+'" data-kind="'+esc(it.kind)+'" style="background:var(--accent);border:none;color:#06121f;font-size:12px;font-weight:800;padding:5px 10px;border-radius:9px">'+(it.kind==='reschedule_approval'?'✓ Move':'✓ Book')+'</button><button class="ibtn-reject" data-id="'+esc(it.id)+'" style="background:var(--surface2);border:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:700;padding:5px 9px;border-radius:9px">✗</button>':'<button class="ibtn-done" data-id="'+esc(it.id)+'" style="background:var(--surface2);border:1px solid var(--line);color:var(--accent);font-size:13px;font-weight:700;padding:4px 11px;border-radius:9px">✓</button>')+'</div></div>';}).join(''):'<div class="loading" style="font-size:15px;padding:48px 24px">🎉 All caught up!<br/><span style="font-size:12.5px;color:var(--faint)">Nothing needs your attention right now.</span></div>';w.innerHTML=head+bodyHtml;var tb=$('inbox-todo');if(tb)tb.onclick=function(){vib(8);var t=prompt('New to-do:');if(t&&t.trim()){inboxApi('todo',{title:t.trim()}).then(loadInbox);}};var unseenIds=items.filter(function(i){return i.status==='unseen';}).map(function(i){return i.id;});if(unseenIds.length)inboxApi('seen',{ids:unseenIds}).then(updateInboxBadge);w.querySelectorAll('.ibtn-done').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(12);inboxApi('handle',{id:b.getAttribute('data-id')}).then(loadInbox);};});w.querySelectorAll('.ibtn-approve').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(12);var it=(inboxItems||[]).find(function(x){return x.id===b.getAttribute('data-id');});var _rk=(b.getAttribute('data-kind')||(it&&it.kind))==='reschedule_approval';if(!confirm((_rk?'Approve this reschedule in Housecall Pro?':'Approve and book this in Housecall Pro?')+'\n\n'+((it&&it.title)||'')+'\n'+((it&&it.preview)||'')))return;b.disabled=true;b.textContent='…';inboxApi(_rk?'approve_reschedule':'approve_booking',{id:b.getAttribute('data-id')}).then(function(r){if(r&&r.ok){vib(20);loadInbox();}else{b.disabled=false;b.textContent=_rk?'✓ Move':'✓ Book';alert('Couldn\'t '+(_rk?'move':'book')+': '+((r&&r.error)||'error'));}});};});w.querySelectorAll('.ibtn-reject').forEach(function(b){b.onclick=function(e){e.stopPropagation();vib(8);if(!confirm('Reject this queued booking? It will be removed without booking.'))return;inboxApi('handle',{id:b.getAttribute('data-id')}).then(loadInbox);};});w.querySelectorAll('[data-inbox-id]').forEach(function(row){row.onclick=function(){var it=(inboxItems||[]).find(function(x){return x.id===row.getAttribute('data-inbox-id');});if(it&&it.kind==='email'&&it.payload&&it.payload.link){window.open(it.payload.link,'_blank');}else if(it&&it.kind==='sms'&&it.customer_phone){openThread(it.customer_phone,it.customer_name||'');}else if(it&&it.kind==='voicemail'){setView('calls');}else if(it&&it.kind==='lead'&&it.customer_phone){openThread(it.customer_phone,it.customer_name||'');}};});}
   // Render a list of threads into a container. Shared by the customer SMS tab and the
   // Team tab — both come from the same hcp-extension-threads payload, just filtered by
   // whether t.team is present (team members + subcontractors) or not (customers).
@@ -321,183 +321,3 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   // Day separators: track the last rendered message's day; emit a "Today / Yesterday /
   // Wed, Jun 10" divider whenever it changes. _lastDay is reset before every full rebuild.
   var _lastDay='';
-  function dayLabel(d){var now=new Date();var t=new Date(now.getFullYear(),now.getMonth(),now.getDate());var y=new Date(t.getTime()-86400000);var dd=new Date(d.getFullYear(),d.getMonth(),d.getDate());if(dd.getTime()===t.getTime())return 'Today';if(dd.getTime()===y.getTime())return 'Yesterday';return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});}
-  // Delivery tick for outbound bubbles (Twilio status flows through sms_messages.status).
-  function tickFor(m){var st=String(m.status||'').toLowerCase();if(st==='sending')return ['…',''];if(st==='delivered'||st==='read')return ['✓✓','ok'];if(st==='failed'||st==='undelivered')return ['⚠️ not delivered',''];return ['✓','']; }
-  function smsBubble(m){var mine=m.direction==='outbound';
-    var d=m.created_at?new Date(m.created_at):null;
-    if(d&&!isNaN(d.getTime())){var dk=d.toDateString();if(dk!==_lastDay){_lastDay=dk;var sep=document.createElement('div');sep.className='daysep';sep.textContent=dayLabel(d);$('sms-scroll').appendChild(sep);}}
-    var row=document.createElement('div');row.className='row'+(mine?' me':'');var b=document.createElement('div');b.className='bubble '+(mine?'me':'them');b.textContent=m.body||'';var media=m.media||m.media_urls;if(media){var arr=Array.isArray(media)?media:[media];arr.forEach(function(u){var url=(u&&u.url)?u.url:u;if(!url)return;var type=((u&&u.content_type)||'').toLowerCase();var raw=String(url);var host='';try{host=new URL(raw).host;}catch(_e){}var src=/(^|\.)twilio\.com$|(^|\.)twiliocdn\.com$/.test(host)?(BASE+'call-recording?url='+encodeURIComponent(raw)):raw;var el=mmsEl(src,type,raw);if(el)b.appendChild(el);});}row.appendChild(b);$('sms-scroll').appendChild(row);var mr=document.createElement('div');mr.className='row metarow'+(mine?' me':'');var __tk=mine?tickFor(m):null;mr.innerHTML='<div class="meta"><span>'+timeShort(m.created_at)+'</span>'+(__tk?('<span class="tick '+__tk[1]+'">'+__tk[0]+'</span>'):'')+'</div>';$('sms-scroll').appendChild(mr);}
-  // Send with optimistic bubble. On failure the bubble marks itself "⚠️ not delivered —
-  // tap to retry" (tap removes it and re-sends) instead of silently looking sent.
-  var _media=null; // pending photo attachment {url, content_type} from mms-upload
-  function sendSms(text){if(!smsOpenPhone||(!text&&!_media))return;$('msg').value='';auto();
-    var sc=$('sms-scroll');
-    smsBubble({direction:'outbound',body:text,created_at:new Date().toISOString(),status:'sending',media:_media?[{url:_media.url,content_type:_media.content_type}]:undefined});
-    var row=sc.children[sc.children.length-2],mr=sc.children[sc.children.length-1];
-    sc.scrollTop=sc.scrollHeight;
-    var media=_media;_media=null;renderMediaPrev();
-    api('hcp-extension-sms',{to:smsOpenPhone,body:text,media_url:media?media.url:undefined,token:token}).then(function(res){if(!(res.j&&res.j.ok)){failBubble(row,mr,text,media,(res.j&&res.j.error)||'Send failed');}}).catch(function(){failBubble(row,mr,text,media,'Network error — not sent');});}
-  function failBubble(row,mr,text,media,err){try{vib(40);toast(err);var tick=mr&&mr.querySelector('.tick');if(tick){tick.textContent='⚠️ not delivered — tap to retry';tick.style.color='#f87171';}if(row){row.style.opacity='.65';row.style.cursor='pointer';row.onclick=function(){vib(10);row.onclick=null;row.remove();if(mr)mr.remove();_media=media||null;sendSms(text);};}}catch(_e){}}
-  // ---- Photo attach (thread composer only): upload via the existing mms-upload fn,
-  //      preview above the composer, sent as MMS through hcp-extension-sms media_url. ----
-  function renderMediaPrev(){var w=$('mediaPrev');if(!w)return;if(!_media){w.classList.add('hide');w.innerHTML='';return;}w.classList.remove('hide');w.innerHTML='';var im=document.createElement('img');im.src=_media.url;var s=document.createElement('span');s.style.cssText='font-size:12px;color:var(--muted)';s.textContent='Photo attached';var rm=document.createElement('button');rm.className='rm';rm.textContent='Remove';rm.onclick=function(){vib(8);_media=null;renderMediaPrev();};w.appendChild(im);w.appendChild(s);w.appendChild(rm);}
-  $('attachBtn').onclick=function(){vib(8);$('attachFile').click();};
-  $('attachFile').addEventListener('change',function(){var f=this.files&&this.files[0];this.value='';if(!f)return;if(f.size>5*1024*1024){toast('Image too large (max 5 MB)');return;}toast('Uploading photo…');var fr=new FileReader();fr.onload=function(){api('mms-upload',{token:token,content_type:f.type,data:String(fr.result),filename:f.name||'image'}).then(function(res){if(res.j&&res.j.url){_media={url:res.j.url,content_type:res.j.content_type||f.type};renderMediaPrev();vib(15);toast('Photo ready — hit send');}else{toast((res.j&&res.j.error)||'Upload failed');}}).catch(function(){toast('Upload failed');});};fr.readAsDataURL(f);});
-
-  function smsThreadTranscript(){var out=[];$('sms-scroll').querySelectorAll('.bubble').forEach(function(b){var t=(b.textContent||'').trim();if(t)out.push((b.classList.contains('me')?'Us: ':'Customer: ')+t);});return out.join('\n');}
-  function smsCtxBlock(){return 'ACTIVE TEXT CONVERSATION with '+(smsOpenName||fmtPhone(smsOpenPhone))+' ('+e164(smsOpenPhone)+'). This is who I am texting; help me reply or book.\n'+smsThreadTranscript();}
-  function smsCompose(instruction,seed){var btn=$('smsDraft');var cur=$('msg').value;if(btn){btn.disabled=true;btn.textContent='…';}var userMsg=seed?(instruction+'\n\nDRAFT:\n'+cur):instruction;api('claude-chat',{messages:[{role:'user',content:userMsg}],token:token,pageContext:smsCtxBlock()}).then(function(res){if(btn){btn.disabled=false;btn.textContent='✍️ Draft';}var reply=(res.j&&res.j.reply)?String(res.j.reply).trim():'';reply=reply.replace(/^["'“”]+|["'“”]+$/g,'').replace(/^\s*::CHIPS::.*$/m,'').trim();if(reply){$('msg').value=reply;auto();$('msg').focus();showSmsTweaks();}else{toast((res.j&&res.j.error)||'Couldn’t draft');}}).catch(function(){if(btn){btn.disabled=false;btn.textContent='✍️ Draft';}toast('Network error');});}
-  function smartDraftSms(){vib(10);var cur=$('msg').value.trim();if(cur)smsCompose("Rewrite the DRAFT below so it is clear, warm, and ready to send in Carnes & Sons' comfort-care voice. Keep the same facts. Output ONLY the message text.",true);else smsCompose("Write a reply to send to this customer now, in Carnes & Sons' warm comfort-care voice — friendly, plain, empathetic, no pressure, no jargon. 1–3 short sentences. Output ONLY the message text.",false);}
-  function showSmsTweaks(){var w=$('smsDraftChips');w.innerHTML='';[['✂️ Shorter',"Make the DRAFT below shorter, keep the meaning and warm voice. Output ONLY the message."],['😊 Warmer',"Make the DRAFT below a touch warmer and more personal, same facts. Output ONLY the message."],['🕐 Add time',"Revise the DRAFT to clearly include the arrival time window we discussed in this conversation. Output ONLY the message."]].forEach(function(p){var b=document.createElement('button');b.className='chipbtn sm';b.textContent=p[0];b.onclick=function(){vib(10);smsCompose(p[1],true);};w.appendChild(b);});}
-  function inline(s){return s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
-  function mdToHtml(t){var lines=esc(t).split('\n');var out='';var inUl=false,inOl=false;function close(){if(inUl){out+='</ul>';inUl=false;}if(inOl){out+='</ol>';inOl=false;}}for(var i=0;i<lines.length;i++){var ln=lines[i];var mUl=ln.match(/^\s*[-•]\s+(.*)/);var mOl=ln.match(/^\s*\d+[.)]\s+(.*)/);if(mUl){if(!inUl){close();out+='<ul>';inUl=true;}out+='<li>'+inline(mUl[1])+'</li>';}else if(mOl){if(!inOl){close();out+='<ol>';inOl=true;}out+='<li>'+inline(mOl[1])+'</li>';}else{close();if(ln.trim()==='')out+='<br/>';else out+=inline(ln)+'<br/>';}}close();return out;}
-  var spkAudio=null,spkUrl=null,spkBtn=null,spkStop=null;var autoSpeak=(localStorage.getItem('cs_autospeak')==='1');function ttsClean(t){return String(t||'').replace(/::CHIPS::.*$/gm,'').replace(/———+/g,'. ').replace(/[⚠️✓✗•▼]/g,'').replace(/https?:\/\/\S+/g,'a link').replace(/\*\*/g,'').replace(/^[\s>#*-]+/gm,'').replace(/`/g,'').slice(0,2000);}function stopSpeak(){try{if(spkAudio){spkAudio.pause();spkAudio.currentTime=0;}}catch(_e){}if(spkUrl){try{URL.revokeObjectURL(spkUrl);}catch(_e){}spkUrl=null;}if(spkBtn){spkBtn.textContent='🔊';}if(spkStop){spkStop.style.display='none';}spkAudio=null;spkBtn=null;spkStop=null;}function speakText(text,btn,stopEl){if(spkAudio&&spkBtn===btn){if(spkAudio.paused){spkAudio.play().catch(function(){});}else{spkAudio.pause();}return;}stopSpeak();if(btn){btn.textContent='…';}fetch(BASE+'elevenlabs-tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:ttsClean(text)})}).then(function(r){if(!r.ok)throw new Error('tts '+r.status);return r.blob();}).then(function(blob){spkUrl=URL.createObjectURL(blob);spkAudio=new Audio(spkUrl);spkBtn=btn;spkStop=stopEl||null;if(spkStop)spkStop.style.display='';spkAudio.onplay=function(){if(spkBtn)spkBtn.textContent='⏸';};spkAudio.onpause=function(){if(spkBtn&&!spkAudio.ended)spkBtn.textContent='▶';};spkAudio.onended=function(){stopSpeak();};spkAudio.play().catch(function(){});}).catch(function(){if(btn)btn.textContent='🔊';toast('Voice failed');});}function setAutoSpeakUI(){var b=$('autospeakBtn');if(b){b.classList.toggle('rec',autoSpeak);b.title=autoSpeak?'Hands-free ON — replies read aloud + mic auto-sends':'Auto-read replies aloud (truck mode)';}}(function(){var b=$('autospeakBtn');if(b){setAutoSpeakUI();b.onclick=function(){autoSpeak=!autoSpeak;localStorage.setItem('cs_autospeak',autoSpeak?'1':'0');setAutoSpeakUI();vib(8);toast(autoSpeak?'Hands-free ON \u2014 speak, it sends, replies play aloud':'Hands-free off');if(!autoSpeak)stopSpeak();};}})();var __fullH=window.innerHeight;function __kbCheck(){var h=window.innerHeight;if(window.visualViewport)h=Math.min(h,window.visualViewport.height);if(h>__fullH)__fullH=h;var ae=document.activeElement;var typing=!!(ae&&(ae.tagName==='TEXTAREA'||ae.tagName==='INPUT'));var open=typing&&(__fullH-h)>150;document.body.classList.toggle('kb-open',open);if(open){try{var v=(typeof view!=='undefined')?view:'';var sc=v==='smsthread'?document.getElementById('sms-scroll'):(v==='chat'?document.getElementById('scroll'):null);if(sc)sc.scrollTop=sc.scrollHeight;}catch(_e){}}}window.addEventListener('resize',__kbCheck);if(window.visualViewport){window.visualViewport.addEventListener('resize',__kbCheck);}document.addEventListener('focusin',__kbCheck);document.addEventListener('focusout',function(){setTimeout(__kbCheck,60);});
-  // ---- Bottom system-bar padding (--safe-b) -------------------------------------------
-  // There is NO direct API to detect Android 3-button navigation. Chrome's
-  // env(safe-area-inset-bottom) is also unreliable there: with 3-button nav it often
-  // reports 0 even when the app draws edge-to-edge BEHIND the black button bar (which
-  // hid our bottom nav under it). So we MEASURE instead:
-  //   1. If env() reports a real inset (gesture-nav phones) -> trust it.
-  //   2. If env()=0 but our window height ~= the full screen height, we're drawing
-  //      behind the system bar -> pad by a standard 48px bar height.
-  //   3. If the window is clearly shorter than the screen (desktop, or the bar sits
-  //      OUTSIDE our viewport), no padding -> no dead space.
-  function __navPad(){
-    try{
-      var probe=document.createElement('div');
-      probe.style.cssText='position:fixed;bottom:0;left:0;width:1px;height:env(safe-area-inset-bottom,0px);visibility:hidden;pointer-events:none';
-      document.body.appendChild(probe);
-      var envPx=probe.getBoundingClientRect().height;probe.remove();
-      var pad=envPx;
-      if(envPx<2&&window.matchMedia&&matchMedia('(display-mode: standalone)').matches){
-        var gap=(screen.height||0)-window.innerHeight;
-        // gap < 48 INCLUDING NEGATIVE: some phones (display cutouts) report innerHeight
-        // LARGER than screen.height — the old gap>=0 check refused to pad there and left
-        // the nav behind the system bar. Any gap smaller than one bar-height means the
-        // bar overlaps our window -> pad.
-        if(gap<48)pad=48;
-      }
-      document.documentElement.style.setProperty('--safe-b',Math.round(pad)+'px');
-      // Size the shell off the REAL visible height (see #shell CSS comment) — keyboard
-      // resizes flow through here too via the resize listener, matching dvh behavior.
-      document.documentElement.style.setProperty('--apph',window.innerHeight+'px');
-    }catch(_e){}
-  }
-  // Measure at startup AND re-measure after the launch settles (Android can report a wrong
-  // window height during the PWA splash moment, which zeroed the padding and hid the nav
-  // behind the system bar on the first view), plus on every resize/rotation/restore.
-  __navPad();setTimeout(__navPad,400);setTimeout(__navPad,1500);
-  window.addEventListener('resize',function(){setTimeout(__navPad,80);});
-  window.addEventListener('orientationchange',function(){setTimeout(__navPad,200);});
-  window.addEventListener('pageshow',function(){setTimeout(__navPad,100);});
-  document.addEventListener('visibilitychange',function(){if(!document.hidden)setTimeout(__navPad,100);});
-  window.__navPad=__navPad; // setView re-measures on every view switch
-  function bubble(role,text,cont){cont=cont||$('scroll');var row=document.createElement('div');row.className='row'+(role==='me'?' me':'');var b=document.createElement('div');b.className='bubble '+(role==='me'?'me':(role==='sys'?'sys':'them'));if(role==='them')b.innerHTML=mdToHtml(text);else b.textContent=text;row.appendChild(b);cont.appendChild(row);if(role!=='sys'){var mr=document.createElement('div');mr.className='row metarow'+(role==='me'?' me':'');var meta=document.createElement('div');meta.className='meta';var ts=document.createElement('span');ts.textContent=nowTime();meta.appendChild(ts);if(role==='them'){var cp=document.createElement('span');cp.className='copy';cp.textContent='Copy';cp.onclick=function(){navigator.clipboard.writeText(text).then(function(){toast('Copied');});};meta.appendChild(cp);var sp=document.createElement('span');sp.className='copy spk';sp.textContent='🔊';sp.title='Listen';var st=document.createElement('span');st.className='copy stp';st.textContent='⏹';st.title='Stop';st.style.display='none';sp.onclick=function(){speakText(text,sp,st);};st.onclick=function(){stopSpeak();};meta.appendChild(sp);meta.appendChild(st);}mr.appendChild(meta);cont.appendChild(mr);}cont.scrollTop=cont.scrollHeight;return b;}
-  function sendChat(t){t=(t||'').trim();if(!t)return;var _st=$('starters');if(_st)_st.remove();$('msg').value='';auto();bubble('me',t,$('scroll'));history.push({role:'user',content:t});$('typing').classList.remove('hide');$('scroll').scrollTop=$('scroll').scrollHeight;api('claude-chat',{messages:history,token:token,pageContext:CHIP_HINT,mode:(autoSpeak?'voice':undefined)}).then(function(res){$('typing').classList.add('hide');var reply=(res.j&&(res.j.reply||res.j.error))||'Sorry, something went wrong.';var chips=[];var m=String(reply).match(/^\s*::CHIPS::\s*(.+)$/m);if(m){chips=m[1].split('|').map(function(s){return s.trim();}).filter(Boolean).slice(0,4);reply=String(reply).replace(m[0],'').trim();}bubble('them',reply,$('scroll'));if(autoSpeak){try{var _sps=$('scroll').querySelectorAll('.spk');var _last=_sps[_sps.length-1];if(_last)_last.onclick();}catch(_e){}}if(chips.length)renderChatChips(chips);history.push({role:'assistant',content:reply});}).catch(function(){$('typing').classList.add('hide');bubble('them','Network error — try again.',$('scroll'));});}
-  // Context-aware starter chips for the Claude chat: if a text thread is open they
-  // target that person (draft/summarize/book/history); otherwise the general set.
-  function chatStarters(){
-    if(smsOpenPhone){
-      var nm=smsOpenName||fmtPhone(smsOpenPhone);
-      var tr=(smsLoaded?smsThreadTranscript():'');
-      var draftV=tr?('Here is my current text thread with '+nm+':\n\n'+tr+'\n\nDraft a warm reply in our comfort-care voice.'):('Draft a warm reply to '+nm+' ('+e164(smsOpenPhone)+') in our comfort-care voice.');
-      var sumV=tr?('Here is my current text thread with '+nm+':\n\n'+tr+'\n\nSummarize it and tell me the single best next action.'):('Summarize my recent texts with '+nm+' and tell me the single best next action.');
-      return [['\u270D\uFE0F Draft a reply',draftV],['\uD83D\uDCCB Summarize thread',sumV],['\uD83D\uDCC5 Book '+nm,'Book a job for '+nm+'. Confirm the details with me, then create it.'],['\uD83D\uDCDC Their history','Pull together '+nm+"'s recent jobs, calls, and texts."]];
-    }
-    return [['\uD83D\uDCC5 Today\'s plan','How does today\'s schedule look — who is going where, and anything I should worry about?'],['\uD83D\uDD0E Look up a customer','Look up a customer for me. Ask me for the name or phone, then show their account, history, and any open jobs.'],['\uD83D\uDCDD Book a job','Help me book a job. Ask me what is needed and for whom, confirm the details, then create it.'],['\uD83D\uDCCD Verify an address','Verify a service address and tell me the jurisdiction and whether a permit is needed. Ask me for the address.'],['\uD83D\uDCB3 Finance a price','Run a financing estimate. Ask me the dollar amount, then show the monthly options.'],['\uD83D\uDD01 Renewals due','Who is due for a membership renewal or a service follow-up?']];
-  }
-  function renderStarters(){var old=$('starters');if(old)old.remove();var st=chatStarters();var row=document.createElement('div');row.id='starters';row.className='row';var box=document.createElement('div');box.style.cssText='display:flex;flex-wrap:wrap;gap:7px;max-width:90%';st.forEach(function(c){var b=document.createElement('button');b.className='chipbtn';b.textContent=c[0];b.onclick=function(){vib(12);var o=$('starters');if(o)o.remove();sendChat(c[1]);};box.appendChild(b);});row.appendChild(box);$('scroll').appendChild(row);$('scroll').scrollTop=$('scroll').scrollHeight;}
-  function renderChatChips(chips){var row=document.createElement('div');row.className='row';var box=document.createElement('div');box.style.cssText='display:flex;flex-wrap:wrap;gap:7px;max-width:88%';chips.forEach(function(lbl){var b=document.createElement('button');b.className='chipbtn';b.textContent=lbl;b.onclick=function(){vib(12);sendChat(lbl);};box.appendChild(b);});row.appendChild(box);$('scroll').appendChild(row);$('scroll').scrollTop=$('scroll').scrollHeight;}
-  function auto(){var m=$('msg');m.style.height='auto';m.style.height=Math.min(m.scrollHeight,120)+'px';m.style.overflowY=m.scrollHeight>120?'auto':'hidden';}
-  function doSend(){vib(10);var t=$('msg').value;if(view==='smsthread')sendSms(t.trim());else sendChat(t);}
-  $('send').onclick=doSend;$('msg').addEventListener('input',auto);$('msg').addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
-
-  // ---- Native-feel touches -----------------------------------------------------------
-  // Haptic tap on every button and conversation row (specific handlers add stronger pulses
-  // for key actions; an extra 7ms overlap is imperceptible).
-  document.addEventListener('click',function(e){var t=e.target&&e.target.closest&&e.target.closest('button,.thread');if(t)vib(7);},{passive:true});
-  // Long-press a message bubble (500ms, like Google Messages) -> copy its text. Cancelled by
-  // any scroll movement; the bubble's native context menu is suppressed so the gesture wins.
-  (function(){var lpT=null,lpEl=null;
-    function start(e){var b=e.target&&e.target.closest&&e.target.closest('.bubble');if(!b)return;lpEl=b;lpT=setTimeout(function(){vib(30);var t=(lpEl&&(lpEl.innerText||'').trim())||'';if(t){navigator.clipboard.writeText(t).then(function(){toast('Copied');}).catch(function(){});}lpT=null;},500);}
-    function cancel(){if(lpT){clearTimeout(lpT);lpT=null;}lpEl=null;}
-    document.addEventListener('touchstart',start,{passive:true});
-    document.addEventListener('touchmove',cancel,{passive:true});
-    document.addEventListener('touchend',cancel,{passive:true});
-    document.addEventListener('touchcancel',cancel,{passive:true});
-    document.addEventListener('contextmenu',function(e){if(e.target&&e.target.closest&&e.target.closest('.bubble'))e.preventDefault();});
-  })();
-
-  var pSy=0,pulling=false,ready=false;var content=$('content');
-  content.addEventListener('touchstart',function(e){if(content.scrollTop<=0&&(view==='sms'||view==='team'||view==='inbox'||view==='today')){pSy=e.touches[0].clientY;pulling=true;ready=false;}},{passive:true});
-  content.addEventListener('touchmove',function(e){if(!pulling)return;var dy=e.touches[0].clientY-pSy;if(dy>8&&content.scrollTop<=0){ready=dy>64;$('ptr').classList.add('show');$('ptr').textContent=ready?'↑ Release to refresh':'↓ Pull to refresh';}},{passive:true});
-  content.addEventListener('touchend',function(){if(pulling&&ready){$('ptr').textContent='Refreshing…';refreshCurrent();setTimeout(function(){$('ptr').classList.remove('show');},800);}else{$('ptr').classList.remove('show');}pulling=false;});
-  // Pull-to-refresh now refreshes DATA in place (native feel). Only the Today view still
-  // does the full app-update reload — that's where "check for a new version" lives.
-  function refreshCurrent(){if(view==='sms'||view==='team'){_listSig='';smsLoaded=false;loadSmsList(true);}else if(view==='inbox'){loadInbox();updateInboxBadge();}else{appRefresh();}}function appRefresh(){try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistration().then(function(reg){var done=function(){location.reload();};if(reg&&reg.update){Promise.resolve(reg.update()).then(done,done);}else{done();}},function(){location.reload();});return;}}catch(_e){}location.reload();}
-
-  // Mic dictation via DEEPGRAM (voice-dictate): record audio, send to the backend, get back
-  // punctuated/capitalized text — the same engine the desktop extension uses. (The old PWA mic
-  // used the phone's raw browser speech recognition, which is why dictation came out with no
-  // punctuation/grammar.) Tap to start, tap to stop; auto-stops at 60s. After transcription, in
-  // truck mode + Claude chat it auto-sends, matching the old hands-free behavior.
-  var recOn=false,_mr=null,_chunks=[],_recStream=null,_recTimer=null;
-  function _stopMic(){try{if(_mr&&_mr.state!=='inactive')_mr.stop();}catch(_e){}if(_recTimer){clearTimeout(_recTimer);_recTimer=null;}}
-  function _micState(on){recOn=on;$('micBtn').classList.toggle('rec',on);}
-  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){$('micBtn').style.display='none';}
-  else{$('micBtn').onclick=function(){
-    if(recOn){_stopMic();return;}
-    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
-      _recStream=stream;_chunks=[];
-      var mime=(window.MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('audio/webm'))?'audio/webm':'';
-      try{_mr=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);}catch(_e){_mr=new MediaRecorder(stream);}
-      _mr.ondataavailable=function(ev){if(ev.data&&ev.data.size>0)_chunks.push(ev.data);};
-      _mr.onstop=function(){
-        _micState(false);
-        try{if(_recStream){_recStream.getTracks().forEach(function(t){t.stop();});_recStream=null;}}catch(_e){}
-        var blob=new Blob(_chunks,{type:(_mr&&_mr.mimeType)||'audio/webm'});
-        if(!blob.size){return;}
-        $('micBtn').classList.add('mic'); // keep styling
-        var prevPh=$('msg').placeholder;$('msg').placeholder='Transcribing…';
-        fetch(BASE+'voice-dictate',{method:'POST',headers:{'Content-Type':blob.type||'audio/webm'},body:blob})
-          .then(function(r){return r.json();})
-          .then(function(d){$('msg').placeholder=prevPh;var tx=(d&&d.text)?String(d.text).trim():'';if(tx){$('msg').value=($('msg').value?($('msg').value.replace(/\s+$/,'')+' '):'')+tx;auto();$('msg').focus();if(autoSpeak&&view==='chat'){doSend();}}else{toast((d&&d.error)?'Couldn’t hear that':'No speech detected');}})
-          .catch(function(){$('msg').placeholder=prevPh;toast('Transcription failed');});
-      };
-      _mr.start();_micState(true);
-      _recTimer=setTimeout(function(){_stopMic();},60000); // safety auto-stop
-    }).catch(function(){toast('Mic permission needed');_micState(false);});
-  };}
-
-  if('serviceWorker' in navigator){var reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloaded)return;reloaded=true;location.reload();});navigator.serviceWorker.register('sw.js').then(function(reg){reg.update();setInterval(function(){reg.update();},60*60*1000);}).catch(function(){});}
-  setInterval(function(){if(document.hidden)return;if(!token)return;updateInboxBadge();if(view==='inbox'){loadInbox();}else if(view==='calls'){loadCalls(true);}else if(view==='sms'||view==='team'){loadSmsList(true);}},20000);
-  // Returning to the app -> immediate refresh of whatever's on screen (don't wait 20s).
-  document.addEventListener('visibilitychange',function(){if(document.hidden||!token)return;updateInboxBadge();if(view==='sms'||view==='team')loadSmsList(true);else if(view==='inbox')loadInbox();else if(view==='calls')loadCalls(true);});
-  // Offline banner: show while disconnected, refresh on reconnect.
-  window.addEventListener('offline',function(){var o=$('offline');if(o)o.classList.remove('hide');});
-  window.addEventListener('online',function(){var o=$('offline');if(o)o.classList.add('hide');toast('Back online');if(token&&view!=='today'&&view!=='chat'&&view!=='smsthread')refreshCurrent();});
-  // NOTE: the open-thread refresh is owned EXCLUSIVELY by the 3s signature-checked poller below.
-  // The 20s poller used to also rebuild the thread (no change-detection) — that was the flicker bug.
-  var _thrSig='';
-  // 3s open-thread poller. If the user is scrolled UP reading older texts, we no longer
-  // silently drop a new message — it's parked in _pendMsgs and the "↓ New message" pill
-  // appears (tap = render + jump to bottom), like a native messenger.
-  var _pendMsgs=null,_pendSig='';
-  setInterval(function(){
-    if(document.hidden)return;
-    if(!token||view!=='smsthread'||!smsOpenPhone||$('msg').value.trim())return;
-    api('hcp-extension-threads',{thread_id:smsOpenPhone,light:true,token:token}).then(function(res){
-      var msgs=(res.j&&res.j.messages)||[];var sc=$('sms-scroll');if(!sc)return;
-      var last=msgs[msgs.length-1]||{};var sig=msgs.length+'|'+(last.created_at||'')+'|'+(last.body||'');
-      if(sig===_thrSig)return;
-      if(sc.scrollHeight-sc.scrollTop-sc.clientHeight>=140){_pendMsgs=msgs;_pendSig=sig;$('newMsgPill').classList.remove('hide');return;}
-      _thrSig=sig;_pendMsgs=null;$('newMsgPill').classList.add('hide');sc.innerHTML='';_lastDay='';
-      if(!msgs.length){sc.innerHTML='<div class="loading">No messages yet.</div>';}
-      msgs.forEach(function(m){smsBubble(m);});appendAltChip(msgs,sc);appendFinanceChips(msgs,sc);sc.scrollTop=sc.scrollHeight;
-    }).catch(function(){});
-  },3000);
-  $('newMsgPill').onclick=function(){vib(10);var sc=$('sms-scroll');$('newMsgPill').classList.add('hide');if(_pendMsgs){_thrSig=_pendSig;sc.innerHTML='';_lastDay='';_pendMsgs.forEach(function(m){smsBubble(m);});appendAltChip(_pendMsgs,sc);appendFinanceChips(_pendMsgs,sc);_pendMsgs=null;}sc.scrollTop=sc.scrollHeight;};
-  if(token)enterApp();
-})();
-</script></body></html>

@@ -1,3 +1,6 @@
+## v2.41.0 (2026-06-14) — reschedule approval queue
+- When a customer agrees to move their appointment (storm reschedules), Claude no longer moves it in Housecall Pro right away. Instead it drops a 🔁 card into your Inbox: tap "✓ Move" to approve (it then reschedules in Housecall and texts the customer), or "✗" to dismiss. These cards stick around even if you close the app or navigate away — nothing happens in Housecall until you tap Approve.
+
 ## v2.40.0 (2026-06-14) — mic uses Deepgram now
 - The mic button in the message box now records your voice and transcribes it through Deepgram (same engine as the desktop side panel), so dictation comes back with punctuation and capitalization instead of a raw run-on. Tap to start, tap to stop (auto-stops after 60s). In truck mode + Claude chat it still auto-sends.
 
