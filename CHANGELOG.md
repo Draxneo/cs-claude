@@ -1,3 +1,6 @@
+## v2.42.1 (2026-06-14) — cleaner booking approval
+- The Approve confirmation for a queued booking no longer shows the appointment twice. It used to print the title and an identical "preview" line, which looked like two bookings. New booking/move cards now carry a short action line under the title, and the confirm box shows the appointment once.
+
 ## v2.42.0 (2026-06-14) — Claude can leave you questions & done-notices in the Inbox
 - When Claude needs you to decide something (and you may have closed the chat), it can drop a ❓ card in your Inbox with one-tap answer chips — tap one and it sends that answer straight to Claude, no typing. When it finishes a background job, it leaves a 🔔 "done" note. Both survive closing/navigating away, so nothing gets lost.
 - Storm/bulk texts now go out ~20 seconds apart through the durable send queue (instead of all at once), and keep sending even if the app is closed.
