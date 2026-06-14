@@ -12,4 +12,5 @@ self.addEventListener('fetch',function(e){
   // fail cleanly, not render an HTML document as a broken blob.
   e.respondWith(fetch(req).then(function(r){if(r&&r.ok&&r.status===200&&r.type==='basic'){var rc=r.clone();caches.open(CACHE).then(function(c){c.put(req,rc);});}return r;}).catch(function(){return caches.match(req).then(function(m){if(m)return m;if(req.mode==='navigate')return caches.match('index.html');return Response.error();});}));
 });
-self.addEventListener('push',function(e){var d={};try{d=e.data?e.data.json():{};}catch(err){d={title:'Carnes & Sons',body:e.data?e.data.text():''};}e.waitUntil(self.registration.showNotification(d.title||'Carnes & Sons',{b
+self.addEventListener('push',function(e){var d={};try{d=e.data?e.data.json():{};}catch(err){d={title:'Carnes & Sons',body:e.data?e.data.text():''};}e.waitUntil(self.registration.showNotification(d.title||'Carnes & Sons',{body:d.body||'',icon:'icon.svg',badge:'icon.svg',data:{url:d.url||'index.html'},tag:d.tag||undefined,renotify:true}));});
+self.addEventListener('notificationclick',function(e){e.notification.close();var url=(e.notification.data&&e.notification.data.url)||'index.html';e.waitUntil(self.clients.matchAll({type:'window'}).then(function(cs){for(var i=0;i<cs.length;i++){if(cs[i].url.indexOf('/cs-claude/')>-1)return cs[i].focus();}return self.clients.openWindow(url);}));});
