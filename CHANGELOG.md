@@ -1,3 +1,6 @@
+## v2.40.0 (2026-06-14) — mic uses Deepgram now
+- The mic button in the message box now records your voice and transcribes it through Deepgram (same engine as the desktop side panel), so dictation comes back with punctuation and capitalization instead of a raw run-on. Tap to start, tap to stop (auto-stops after 60s). In truck mode + Claude chat it still auto-sends.
+
 ## v2.39.0 (2026-06-12) — financing chips
 - When financing comes up in a text thread, green chips appear: "Explain financing" (Claude drafts the Synchrony 5.9%/9.9% promo explanation + the 26% APR reassurance), "Send Synchrony link", and "Send FTL link". Link chips drop a ready message into the composer for you to review and send.
 

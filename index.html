@@ -171,7 +171,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.39.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.40.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
   </section>
@@ -188,13 +188,13 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 </nav>
 </div>
 <div class="callscreen" id="callscreen"><div class="cav" id="callAv">#</div><div class="cname" id="callName"></div><div class="cstat" id="callStat">Calling…</div><div class="ctimer" id="callTimer"></div><div class="cbtns"><button class="cbtn mute" id="muteBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0012 0M12 17v4"/></svg>Mute</button><button class="cbtn end" id="hangBtn"><svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5C8 5 16 5 21 9.5l-2.5 3-3.5-1.5v-2a11 11 0 00-6 0v2L5.5 12.5z"/></svg>End</button></div></div>
-<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.39.0</div></div>
+<div class="login on" id="login"><div class="logo">C&amp;S</div><h1>Carnes &amp; Sons</h1><p id="loginMsg">Sign in with your staff phone number.</p><div id="step1" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="phone" type="tel" placeholder="+1 210 555 1234" autocomplete="tel"/><button class="cta" id="sendBtn">Text me a code</button></div><div id="step2" class="hide" style="display:flex;flex-direction:column;gap:12px;align-items:center;width:100%"><input id="code" type="tel" inputmode="numeric" placeholder="6-digit code" maxlength="6"/><button class="cta" id="verifyBtn">Sign in</button><button class="link" id="backBtn">Use a different number</button></div><div class="err" id="loginErr"></div><div class="ver">Carnes &amp; Sons • v2.40.0</div></div>
 <div class="lb hide" id="lb"></div>
 <div class="toast" id="toast"></div>
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.39.0';
+  var VERSION='2.40.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -437,8 +437,38 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   // does the full app-update reload — that's where "check for a new version" lives.
   function refreshCurrent(){if(view==='sms'||view==='team'){_listSig='';smsLoaded=false;loadSmsList(true);}else if(view==='inbox'){loadInbox();updateInboxBadge();}else{appRefresh();}}function appRefresh(){try{if('serviceWorker' in navigator){navigator.serviceWorker.getRegistration().then(function(reg){var done=function(){location.reload();};if(reg&&reg.update){Promise.resolve(reg.update()).then(done,done);}else{done();}},function(){location.reload();});return;}}catch(_e){}location.reload();}
 
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;var rec=null,recOn=false;
-  if(!SR){$('micBtn').style.display='none';}else{rec=new SR();rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=1;rec.onresult=function(e){var tx=e.results[0][0].transcript;$('msg').value=($('msg').value?($('msg').value+' '):'')+tx;auto();};rec.onend=function(){recOn=false;$('micBtn').classList.remove('rec');if(autoSpeak&&view==='chat'){var _hf=($('msg').value||'').trim();if(_hf){doSend();}}};rec.onerror=function(){recOn=false;$('micBtn').classList.remove('rec');};$('micBtn').onclick=function(){if(recOn){rec.stop();return;}try{rec.start();recOn=true;$('micBtn').classList.add('rec');$('msg').focus();}catch(_e){}};}
+  // Mic dictation via DEEPGRAM (voice-dictate): record audio, send to the backend, get back
+  // punctuated/capitalized text — the same engine the desktop extension uses. (The old PWA mic
+  // used the phone's raw browser speech recognition, which is why dictation came out with no
+  // punctuation/grammar.) Tap to start, tap to stop; auto-stops at 60s. After transcription, in
+  // truck mode + Claude chat it auto-sends, matching the old hands-free behavior.
+  var recOn=false,_mr=null,_chunks=[],_recStream=null,_recTimer=null;
+  function _stopMic(){try{if(_mr&&_mr.state!=='inactive')_mr.stop();}catch(_e){}if(_recTimer){clearTimeout(_recTimer);_recTimer=null;}}
+  function _micState(on){recOn=on;$('micBtn').classList.toggle('rec',on);}
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){$('micBtn').style.display='none';}
+  else{$('micBtn').onclick=function(){
+    if(recOn){_stopMic();return;}
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      _recStream=stream;_chunks=[];
+      var mime=(window.MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported('audio/webm'))?'audio/webm':'';
+      try{_mr=mime?new MediaRecorder(stream,{mimeType:mime}):new MediaRecorder(stream);}catch(_e){_mr=new MediaRecorder(stream);}
+      _mr.ondataavailable=function(ev){if(ev.data&&ev.data.size>0)_chunks.push(ev.data);};
+      _mr.onstop=function(){
+        _micState(false);
+        try{if(_recStream){_recStream.getTracks().forEach(function(t){t.stop();});_recStream=null;}}catch(_e){}
+        var blob=new Blob(_chunks,{type:(_mr&&_mr.mimeType)||'audio/webm'});
+        if(!blob.size){return;}
+        $('micBtn').classList.add('mic'); // keep styling
+        var prevPh=$('msg').placeholder;$('msg').placeholder='Transcribing…';
+        fetch(BASE+'voice-dictate',{method:'POST',headers:{'Content-Type':blob.type||'audio/webm'},body:blob})
+          .then(function(r){return r.json();})
+          .then(function(d){$('msg').placeholder=prevPh;var tx=(d&&d.text)?String(d.text).trim():'';if(tx){$('msg').value=($('msg').value?($('msg').value.replace(/\s+$/,'')+' '):'')+tx;auto();$('msg').focus();if(autoSpeak&&view==='chat'){doSend();}}else{toast((d&&d.error)?'Couldn’t hear that':'No speech detected');}})
+          .catch(function(){$('msg').placeholder=prevPh;toast('Transcription failed');});
+      };
+      _mr.start();_micState(true);
+      _recTimer=setTimeout(function(){_stopMic();},60000); // safety auto-stop
+    }).catch(function(){toast('Mic permission needed');_micState(false);});
+  };}
 
   if('serviceWorker' in navigator){var reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloaded)return;reloaded=true;location.reload();});navigator.serviceWorker.register('sw.js').then(function(reg){reg.update();setInterval(function(){reg.update();},60*60*1000);}).catch(function(){});}
   setInterval(function(){if(document.hidden)return;if(!token)return;updateInboxBadge();if(view==='inbox'){loadInbox();}else if(view==='calls'){loadCalls(true);}else if(view==='sms'||view==='team'){loadSmsList(true);}},20000);
