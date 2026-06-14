@@ -1,3 +1,7 @@
+## v2.42.0 (2026-06-14) — Claude can leave you questions & done-notices in the Inbox
+- When Claude needs you to decide something (and you may have closed the chat), it can drop a ❓ card in your Inbox with one-tap answer chips — tap one and it sends that answer straight to Claude, no typing. When it finishes a background job, it leaves a 🔔 "done" note. Both survive closing/navigating away, so nothing gets lost.
+- Storm/bulk texts now go out ~20 seconds apart through the durable send queue (instead of all at once), and keep sending even if the app is closed.
+
 ## v2.41.0 (2026-06-14) — reschedule approval queue
 - When a customer agrees to move their appointment (storm reschedules), Claude no longer moves it in Housecall Pro right away. Instead it drops a 🔁 card into your Inbox: tap "✓ Move" to approve (it then reschedules in Housecall and texts the customer), or "✗" to dismiss. These cards stick around even if you close the app or navigate away — nothing happens in Housecall until you tap Approve.
 
