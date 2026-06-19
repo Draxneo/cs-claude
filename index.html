@@ -70,7 +70,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:13px}
 .card h3{margin:0 0 4px;font-size:15px;font-weight:700}.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 .card ol{margin:8px 0 0;padding-left:18px;color:var(--muted);font-size:13px;line-height:1.6}
-.btn{margin-top:12px;width:100%;padding:12px;border-radius:11px;border:none;background:var(--grad);color:#06121f;font-size:14px;font-weight:800;cursor:pointer}
+.btn{display:block;box-sizing:border-box;text-align:center;text-decoration:none;margin-top:12px;width:100%;padding:12px;border-radius:11px;border:none;background:var(--grad);color:#06121f;font-size:14px;font-weight:800;cursor:pointer}
 .btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
 .pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-left:6px}
 .pill.on{background:rgba(52,211,238,.15);color:var(--accent)}.pill.off{background:var(--surface2);color:var(--muted)}
@@ -223,7 +223,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.43.0';
+  var VERSION='2.43.1';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
