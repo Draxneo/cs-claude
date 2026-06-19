@@ -33,6 +33,17 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 .content::-webkit-scrollbar-thumb,.scroll::-webkit-scrollbar-thumb,.composer textarea::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
 .content::-webkit-scrollbar-track,.scroll::-webkit-scrollbar-track{background:transparent}
 .view{display:none;padding:16px}.view.on{display:block}
+/* ===== Owner toggle switches (Alerts admin: forwarding + going mobile) ===== */
+.swrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--border,#1e2a3a)}
+.swrow:first-of-type{border-top:0}
+.swlbl{font-size:14px;font-weight:600}
+.swsub{font-size:11px;color:var(--text-muted,#8aa0b6);margin-top:2px}
+.sw{width:48px;height:27px;border-radius:999px;border:1px solid var(--border-strong,#2b3b50);background:var(--surface-2,#16202e);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s,border-color .2s,box-shadow .2s;padding:0}
+.sw .sw-k{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:#cbd5e1;transition:left .2s cubic-bezier(.4,1.3,.6,1),background .2s}
+.sw.on{background:#22d3ee;border-color:#22d3ee;box-shadow:0 0 8px 1px rgba(34,211,238,.5)}
+.sw.on .sw-k{left:23px;background:#06121f}
+.sw.busy{opacity:.55;pointer-events:none}
+.swnote{font-size:12px;margin-top:10px;line-height:1.35}
 #view-today.on{padding:16px 16px 28px}#view-sms.on{padding:0}#view-team.on{padding:0}#view-inbox.on{padding:0}#view-calls.on{padding:0}
 #view-chat.on,#view-smsthread.on{display:flex;flex-direction:column;padding:0;height:100%;position:relative}
 .searchwrap{padding:10px 12px 6px}
@@ -168,6 +179,21 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   <section class="view" id="view-alerts">
     <div class="sect">Notifications</div>
     <div class="card"><h3>Alerts <span class="pill off" id="notifPill">Off</span></h3><p>Get a push when an emergency text comes in after hours, a new voicemail lands, or your morning briefing is ready.</p><button class="btn" id="enableNotifs">Enable notifications</button><button class="btn ghost" id="testNotif">Send test notification</button></div>
+    <!-- OWNER CONTROLS (admin only): per-department answering-service forwarding + Going mobile.
+         Hidden by default; revealed + painted by initAdminCard() after ivr-config returns is_admin. -->
+    <div class="sect" id="admin-sect" style="display:none">Owner controls</div>
+    <div class="card" id="admin-fwd-card" style="display:none">
+      <h3>Phone routing</h3>
+      <p>Send a department's calls to the answering service. The press-1 / press-2 menu still plays; this routes around the clock until you turn it off.</p>
+      <div class="swrow"><div><div class="swlbl">Service calls &rarr; answering service</div><div class="swsub">Press 1</div></div><button class="sw" id="sw-svc" role="switch" aria-checked="false"><span class="sw-k"></span></button></div>
+      <div class="swrow"><div><div class="swlbl">Sales calls &rarr; answering service</div><div class="swsub">Press 2</div></div><button class="sw" id="sw-sales" role="switch" aria-checked="false"><span class="sw-k"></span></button></div>
+      <p class="swnote" id="fwd-num-note"></p>
+    </div>
+    <div class="card" id="admin-gm-card" style="display:none">
+      <h3>Going mobile</h3>
+      <p>When ON, customer texts during business hours also push and text your cell (not just after hours). Stays on until you turn it off.</p>
+      <div class="swrow"><div><div class="swlbl">Going mobile</div><div class="swsub" id="gm-sub">Off</div></div><button class="sw" id="sw-gm" role="switch" aria-checked="false"><span class="sw-k"></span></button></div>
+    </div>
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
@@ -197,7 +223,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.42.3';
+  var VERSION='2.43.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -261,8 +287,8 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   $('verifyBtn').onclick=function(){var c=$('code').value.trim();if(!c){showErr('Enter the code.');return;}showErr('');$('verifyBtn').textContent='Signing in…';$('verifyBtn').disabled=true;api('extension-otp-verify',{phone:phoneVal,code:c}).then(function(res){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;if(res.ok&&res.j&&res.j.token){token=res.j.token;who=res.j.employee_name||'';localStorage.setItem('cs_token',token);localStorage.setItem('cs_name',who);enterApp();}else showErr((res.j&&res.j.error)||'Invalid code.');}).catch(function(){$('verifyBtn').textContent='Sign in';$('verifyBtn').disabled=false;showErr('Network error.');});};
   $('logoutBtn').onclick=function(){localStorage.removeItem('cs_token');localStorage.removeItem('cs_name');location.reload();};
 
-  function enterApp(){$('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');$('who').textContent=(who?who:'Owner')+' · v'+VERSION;var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';$('hello').textContent=part+(first?(', '+first):'');var __an=$('acctName');if(__an)__an.textContent=(who||'Owner');$('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}if(('Notification' in window)&&Notification.permission==='granted')subscribePush();updateInboxBadge();setView('today');}
-  function setView(v){var _pv=view;view=v;var _oc=(_pv==='smsthread')?'sms':(_pv==='chat'?'chat':null);var _nc=(v==='smsthread')?'sms':(v==='chat'?'chat':null);if(_oc&&_oc!==_nc){_drafts[_oc]=$('msg').value;}$('appbar').classList.toggle('on',v==='today');document.body.classList.toggle('no-appbar',v!=='today');['today','sms','team','smsthread','inbox','calls','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});document.querySelectorAll('.bnav button').forEach(function(b){var bv=b.getAttribute('data-v');b.classList.toggle('on',bv===v||(v==='smsthread'&&bv==='sms'));});$('composer').classList.toggle('on',v==='chat'||v==='smsthread');$('attachBtn').classList.toggle('hide',v!=='smsthread');if(v!=='smsthread'&&typeof _media!=='undefined'&&_media){_media=null;renderMediaPrev();}if(_nc&&_oc!==_nc){$('msg').value=_drafts[_nc]||'';auto();}if(!_nc){document.body.classList.remove('kb-open');}if(v!=='chat'&&v!=='smsthread'){$('content').scrollTop=0;}try{if(window.__navPad)window.__navPad();}catch(_e){}if(token){$('bnav').classList.add('on');} /* self-heal: nav must NEVER stay hidden while logged in */if(!_navBack){try{var _hp=(v==='smsthread')?(smsOpenPhone||null):null;var hs=window.history.state||{};if(hs.v!==v||hs.p!==_hp){if(hs.v){window.history.pushState({v:v,p:_hp},'');}else{window.history.replaceState({v:v,p:_hp},'');}}}catch(_e){}}if(v==='chat'){$('msg').placeholder='Ask Claude…';if(!greeted){greeted=true;bubble('sys','Ask me anything — check the schedule, look up a customer, draft or summarize a text, book a job, verify an address, run a finance estimate, or see who is due for renewal.',$('scroll'));}if(history.length===0){renderStarters();}setTimeout(function(){$('msg').focus();},50);}if(v==='sms'){loadSmsList();}if(v==='team'){loadTeamList();}if(v==='smsthread'){$('msg').placeholder='Text '+(smsOpenName||fmtPhone(smsOpenPhone))+'…';setTimeout(function(){$('msg').focus();},50);}if(v==='inbox'){loadInbox();}if(v==='calls'){loadCalls(false);}if(v==='alerts'){refreshNotifPill();}}
+  function enterApp(){$('login').classList.remove('on');$('appbar').classList.add('on');$('bnav').classList.add('on');$('who').textContent=(who?who:'Owner')+' · v'+VERSION;var h=new Date().getHours();var part=h<12?'Good morning':h<17?'Good afternoon':'Good evening';var first=who?who.split(' ')[0]:'';$('hello').textContent=part+(first?(', '+first):'');var __an=$('acctName');if(__an)__an.textContent=(who||'Owner');$('subhello').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});buildChips();refreshNotifPill();try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(_e){}if(('Notification' in window)&&Notification.permission==='granted')subscribePush();updateInboxBadge();initAdminCard();setView('today');}
+  function setView(v){var _pv=view;view=v;var _oc=(_pv==='smsthread')?'sms':(_pv==='chat'?'chat':null);var _nc=(v==='smsthread')?'sms':(v==='chat'?'chat':null);if(_oc&&_oc!==_nc){_drafts[_oc]=$('msg').value;}$('appbar').classList.toggle('on',v==='today');document.body.classList.toggle('no-appbar',v!=='today');['today','sms','team','smsthread','inbox','calls','chat','alerts'].forEach(function(n){$('view-'+n).classList.toggle('on',n===v);});document.querySelectorAll('.bnav button').forEach(function(b){var bv=b.getAttribute('data-v');b.classList.toggle('on',bv===v||(v==='smsthread'&&bv==='sms'));});$('composer').classList.toggle('on',v==='chat'||v==='smsthread');$('attachBtn').classList.toggle('hide',v!=='smsthread');if(v!=='smsthread'&&typeof _media!=='undefined'&&_media){_media=null;renderMediaPrev();}if(_nc&&_oc!==_nc){$('msg').value=_drafts[_nc]||'';auto();}if(!_nc){document.body.classList.remove('kb-open');}if(v!=='chat'&&v!=='smsthread'){$('content').scrollTop=0;}try{if(window.__navPad)window.__navPad();}catch(_e){}if(token){$('bnav').classList.add('on');} /* self-heal: nav must NEVER stay hidden while logged in */if(!_navBack){try{var _hp=(v==='smsthread')?(smsOpenPhone||null):null;var hs=window.history.state||{};if(hs.v!==v||hs.p!==_hp){if(hs.v){window.history.pushState({v:v,p:_hp},'');}else{window.history.replaceState({v:v,p:_hp},'');}}}catch(_e){}}if(v==='chat'){$('msg').placeholder='Ask Claude…';if(!greeted){greeted=true;bubble('sys','Ask me anything — check the schedule, look up a customer, draft or summarize a text, book a job, verify an address, run a finance estimate, or see who is due for renewal.',$('scroll'));}if(history.length===0){renderStarters();}setTimeout(function(){$('msg').focus();},50);}if(v==='sms'){loadSmsList();}if(v==='team'){loadTeamList();}if(v==='smsthread'){$('msg').placeholder='Text '+(smsOpenName||fmtPhone(smsOpenPhone))+'…';setTimeout(function(){$('msg').focus();},50);}if(v==='inbox'){loadInbox();}if(v==='calls'){loadCalls(false);}if(v==='alerts'){refreshNotifPill();initAdminCard();}}
   document.querySelectorAll('.bnav button').forEach(function(b){b.onclick=function(){vib(8);setView(b.getAttribute('data-v'));};});
   $('smsBack').onclick=function(){setView('sms');};
   // Compact header: customer details + Draft/Summarize/Book live in a collapsible panel,
@@ -286,6 +312,48 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   // Diagnostics reachable from TWO places (in case one is unreachable when a bug hides the
   // nav): the version pill in Alerts AND the "Clint Carnes · vX" subtitle in the home appbar.
   (function(){var vp=$('verPill');if(vp)vp.onclick=__diag;var who=$('who');if(who)who.onclick=__diag;})();
+
+  // ===== OWNER CONTROLS in Alerts (admin only) =====
+  // Per-department answering-service forwarding + Going mobile, written via the SAME admin-gated
+  // ivr-config endpoint the desktop uses. ivr-config returns {is_admin, config}; non-admins get
+  // is_admin:false and the cards stay hidden. We always repaint from the server's returned config
+  // (single source of truth) so a toggle never lies about what's actually live.
+  var _adminCfg=null;
+  function initAdminCard(){
+    if(!token)return;
+    api('ivr-config',{token:token}).then(function(res){
+      var j=res.j||{}; var isAdmin=!!j.is_admin, cfg=j.config||null;
+      var show=(isAdmin&&cfg)?'':'none';
+      ['admin-sect','admin-fwd-card','admin-gm-card'].forEach(function(id){var el=$(id);if(el)el.style.display=show;});
+      if(isAdmin&&cfg){_adminCfg=cfg;paintAdminCard();}
+    }).catch(function(){});
+  }
+  function paintAdminCard(){
+    var c=_adminCfg||{};
+    function set(id,on){var el=$(id);if(!el)return;el.classList.toggle('on',!!on);el.setAttribute('aria-checked',on?'true':'false');}
+    set('sw-svc',c.svc_to_answering_service); set('sw-sales',c.sales_to_answering_service); set('sw-gm',c.owner_mobile);
+    var sub=$('gm-sub'); if(sub)sub.textContent=c.owner_mobile?'On':'Off';
+    var note=$('fwd-num-note');
+    if(note){var n=c.answering_service_number;
+      if(n){note.style.color='var(--text-muted,#8aa0b6)';note.textContent='Answering service number: '+fmtPhone(n)+' (set on the desktop admin).';}
+      else{note.style.color='#fbbf24';note.textContent='⚠ No answering-service number set yet — set it on the desktop (admin → Phone & IVR). Forwarding has no effect until then.';}
+    }
+  }
+  function setFwd(key,btn){
+    if(!_adminCfg||!btn||btn.classList.contains('busy'))return;
+    var next=!btn.classList.contains('on'); var set={}; set[key]=next;
+    btn.classList.add('busy'); vib(8);
+    api('ivr-config',{token:token,set:set}).then(function(res){
+      var j=res.j||{};
+      if(j&&j.is_admin&&j.config){_adminCfg=j.config;paintAdminCard();toast(next?'Forwarding on':'Forwarding off');}
+      else{toast((j&&j.error)||'Save failed');paintAdminCard();}
+    }).catch(function(){toast('Network error');paintAdminCard();}).then(function(){btn.classList.remove('busy');});
+  }
+  (function(){
+    [['sw-svc','svc_to_answering_service'],['sw-sales','sales_to_answering_service'],['sw-gm','owner_mobile']].forEach(function(p){
+      var el=$(p[0]); if(el)el.onclick=function(){setFwd(p[1],el);};
+    });
+  })();
 
   var IC={cal:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="3"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>',vm:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l1.5 5-2 1a11 11 0 005 5l1-2 5 1.5V21a1 1 0 01-1 1A17 17 0 014 6a1 1 0 011-2z"/></svg>',ppl:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3.5 20a5.5 5.5 0 0111 0"/><path d="M16 5.5a3 3 0 010 5.8M20.5 20a5.5 5.5 0 00-3.5-5.1"/></svg>',doc:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v4h4M9 12.5h6M9 16.5h6"/></svg>',pin:'<svg class="icn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.2 7-11a7 7 0 10-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>'};
   var CHIPS=[{ic:IC.cal,t:"Today's schedule",q:'How does today’s schedule look? Who is going where?'},{ic:IC.vm,t:'Voicemails',s:'Anything I haven’t seen',q:'Are there any new voicemails or missed calls I should know about?'},{ic:IC.ppl,t:'Who’s working',q:'Who is working today and what are they assigned to?'},{ic:IC.doc,t:'Open estimates',q:'Any new or open estimates I should follow up on?'},{ic:IC.pin,t:'Can we fit a job?',s:'Tell me the ZIP',q:'Can we fit in a new service call today in ZIP '},{ic:IC.ppl,t:'Look up a customer',q:'Look up a customer for me. Ask me for the name or phone number, then show their account, history, and any open jobs or estimates.'},{ic:IC.cal,t:'Book a job',q:'Help me book a job. Ask me what is needed and for whom, confirm the details, then create it in Housecall Pro.'},{ic:IC.doc,t:'Renewals due',q:'Who is due for a membership renewal or a service follow-up?'},{ic:IC.ppl,t:'Fix a customer detail',q:'Update a customer’s details — fix a misspelled name, or add/correct an email or phone. Tell me the customer (or the job number) and what to change; confirm before saving.'}];
