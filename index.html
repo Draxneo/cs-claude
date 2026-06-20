@@ -223,7 +223,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.43.1';
+  var VERSION='2.43.2';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -277,7 +277,19 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   function startTimer(){callStart=Date.now();if(callTick)clearInterval(callTick);callTick=setInterval(function(){var s=Math.floor((Date.now()-callStart)/1000);var m=Math.floor(s/60);$('callTimer').textContent=(m<10?'0':'')+m+':'+((s%60)<10?'0':'')+(s%60);},1000);}
   function getVoiceToken(){return api('twilio-token',{token:token,identity:'pwa-owner'}).then(function(res){if(res.j&&res.j.token)return res.j.token;throw new Error((res.j&&res.j.error)||'token');});}
   function ensureDevice(){if(device)return Promise.resolve(device);if(!window.Twilio||!window.Twilio.Device)return Promise.reject(new Error('Dialer still loading — try again'));return getVoiceToken().then(function(vt){device=new window.Twilio.Device(vt,{codecPreferences:['opus','pcmu'],logLevel:'error'});device.on('tokenWillExpire',function(){getVoiceToken().then(function(t2){try{device.updateToken(t2);}catch(_e){}}).catch(function(){});});device.on('error',function(e){toast((e&&e.message)?('Call error: '+e.message):'Call error');endCallUI();});return device;});}
-  function placeCall(number,name){var to=e164(number);if(!to){toast('No number to call');return;}openCallUI(name,to);ensureDevice().then(function(dev){var p=dev.connect({params:{To:to}});var bind=function(call){activeCall=call;call.on('accept',function(){callStat('In call');startTimer();});call.on('disconnect',endCallUI);call.on('cancel',endCallUI);call.on('reject',function(){callStat('Call rejected');setTimeout(endCallUI,1200);});};if(p&&p.then){p.then(bind).catch(function(){toast('Could not start call');endCallUI();});}else{bind(p);}}).catch(function(e){toast((e&&e.message)||'Call failed');endCallUI();});}
+  function placeCall(number,name){var to=e164(number);if(!to){toast('No number to call');return;}
+    // MIC FIRST (fix 2026-06-19 "they couldn't hear me"): explicitly acquire the microphone within
+    // this tap BEFORE handing off to Twilio's dialer. Without this, the call can connect but the
+    // Twilio SDK's internal getUserMedia was never authorized for this PWA origin, so the other side
+    // hears silence. We grant permission here, immediately release our probe stream (the grant
+    // persists for the origin and Twilio opens its own), THEN connect. If the mic is blocked, we tell
+    // the owner how to fix it instead of placing a dead call. (The desktop extension already does this.)
+    if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){toast("This browser can't use the mic for calls");return;}
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      try{stream.getTracks().forEach(function(t){t.stop();});}catch(_e){}
+      openCallUI(name,to);
+      return ensureDevice();
+    }).then(function(dev){var p=dev.connect({params:{To:to}});var bind=function(call){activeCall=call;call.on('accept',function(){callStat('In call');startTimer();});call.on('disconnect',endCallUI);call.on('cancel',endCallUI);call.on('reject',function(){callStat('Call rejected');setTimeout(endCallUI,1200);});};if(p&&p.then){p.then(bind).catch(function(){toast('Could not start call');endCallUI();});}else{bind(p);}}).catch(function(e){var blocked=e&&(e.name==='NotAllowedError'||e.name==='SecurityError'||e.name==='NotFoundError');toast(blocked?'Microphone is blocked — allow mic access for this app in your browser settings, then call again':((e&&e.message)||'Call failed'));endCallUI();});}
   $('muteBtn').onclick=function(){if(!activeCall)return;callMuted=!callMuted;try{activeCall.mute(callMuted);}catch(_e){}$('muteBtn').classList.toggle('on',callMuted);};
   $('hangBtn').onclick=function(){try{if(activeCall)activeCall.disconnect();}catch(_e){}endCallUI();};
   $('smsCall').onclick=function(){if(smsOpenPhone)placeCall(smsOpenPhone,smsOpenName);};
