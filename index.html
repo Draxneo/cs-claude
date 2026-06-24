@@ -198,7 +198,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
     <div class="sect">Always deliver (Android)</div>
     <div class="card"><h3>Set battery to Unrestricted</h3><p>So alerts arrive even when the app is closed:</p><ol><li>Long-press the app icon → App info</li><li>Tap Battery</li><li>Choose Unrestricted</li></ol></div>
     <div class="sect">App</div>
-    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.44.2</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
+    <div class="card"><h3>Version <span class="pill on" id="verPill">v2.45.0</span></h3><p>Stuck on an old screen? Force the latest version.</p><button class="btn ghost" id="forceBtn">Force update</button></div>
     <div class="sect">Account</div>
     <div class="card"><h3>Account</h3><p>Signed in as <b id="acctName">—</b>.</p><button class="btn ghost" id="logoutBtn">Log out</button></div>
     <div class="sect">Work in progress</div>
@@ -226,7 +226,7 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
 <div id="offline" class="hide">📡 No connection — messages will load when you're back online</div>
 <script>
 (function(){
-  var VERSION='2.44.2';
+  var VERSION='2.45.0';
   var BASE='https://bqsjbwwkjhrthqxgybht.supabase.co/functions/v1/';
   var VAPID='BIYwcro2wSzqvXjc4hecHf1bEdAviH3QxCibsL2pn3IgYNsnq7zbIQbkqjSCzk7s5W9p4pcC9DAvfRxiiDQPcwc';
   var token=localStorage.getItem('cs_token');var who=localStorage.getItem('cs_name')||'';
@@ -590,7 +590,20 @@ audio{filter:invert(.88) hue-rotate(180deg);border-radius:17px}
   };}
 
   if('serviceWorker' in navigator){var reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(reloaded)return;reloaded=true;location.reload();});navigator.serviceWorker.register('sw.js').then(function(reg){reg.update();setInterval(function(){reg.update();},60*60*1000);}).catch(function(){});}
-  setInterval(function(){if(document.hidden)return;if(!token)return;updateInboxBadge();if(view==='inbox'){loadInbox();}else if(view==='calls'){loadCalls(true);}else if(view==='sms'||view==='team'){loadSmsList(true);}},20000);
+  // LIVE REFRESH: the service worker forwards every inbound-text push here as a 'sms-refresh'
+  // message (it fires even while the app is in the foreground). When it lands we repaint the
+  // current list/badge IMMEDIATELY instead of waiting for the backstop poll below — this is what
+  // makes the phone "keep up" without a manual refresh. The open thread is owned by its own 3s
+  // poller, so we only nudge the list + badge here.
+  if('serviceWorker' in navigator){navigator.serviceWorker.addEventListener('message',function(e){
+    if(!e||!e.data||e.data.type!=='sms-refresh'||!token)return;
+    try{updateInboxBadge();}catch(_e){}
+    if(view==='sms'||view==='team'){try{loadSmsList(true);}catch(_e){}}
+    else if(view==='inbox'){try{loadInbox();}catch(_e){}}
+  });}
+  // Backstop poll (10s, foreground only). Push-driven refresh above is the primary path; this
+  // catches anything if a push is delayed/throttled (notably iOS PWAs hold pushes in foreground).
+  setInterval(function(){if(document.hidden)return;if(!token)return;updateInboxBadge();if(view==='inbox'){loadInbox();}else if(view==='calls'){loadCalls(true);}else if(view==='sms'||view==='team'){loadSmsList(true);}},10000);
   // Returning to the app -> immediate refresh of whatever's on screen (don't wait 20s).
   document.addEventListener('visibilitychange',function(){if(document.hidden||!token)return;updateInboxBadge();if(view==='sms'||view==='team')loadSmsList(true);else if(view==='inbox')loadInbox();else if(view==='calls')loadCalls(true);});
   // Offline banner: show while disconnected, refresh on reconnect.
